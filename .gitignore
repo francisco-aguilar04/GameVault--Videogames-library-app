@@ -1,0 +1,48 @@
+# === PYTHON ===
+# Ignorar entornos virtuales (tanto venv como .venv si volviera a aparecer)
+**/venv/
+**/.venv/
+ENV/
+env/
+
+# Archivos temporales de Python y caché
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+htmlcov/
+.tox/
+.coverage
+.cache
+.pytest_cache/
+
+# === GO (GOLANG) ===
+# Binarios compilados y ejecutables
+**/backend-go/backend-go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Carpetas de testing y temporales de Go
+*.test
+*.out
+
+# === VARIABLES DE ENTORNO (Seguridad) ===
+# Archivos donde guardaremos contraseñas y llaves de la IA más adelante
+.env
+.env.local
+.env.*
+
+# === EDITORES DE CÓDIGO Y SISTEMA ===
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.DS_Store
+Thumbs.db
