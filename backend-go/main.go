@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"gamevault-backend/db"
+	"gamevault-backend/internal/handlers"
 )
 
 func main() {
@@ -36,6 +37,10 @@ func main() {
 	}
 
 	router = gin.Default()
+	router.POST("/platforms", handlers.CreatePlatformHandler(pool))
+	router.DELETE("/platforms/:id", handlers.DeletePlatformHandler(pool))
+	router.GET("/platforms/:id", handlers.GetPlatformHandler(pool))
+	router.PUT("/platforms/:id", handlers.UpdatePlatformHandler(pool))
 
 	router.GET("/health", func(c *gin.Context) {
 
