@@ -41,6 +41,11 @@ func main() {
 	router.DELETE("/platforms/:id", handlers.DeletePlatformHandler(pool))
 	router.GET("/platforms/:id", handlers.GetPlatformHandler(pool))
 	router.PUT("/platforms/:id", handlers.UpdatePlatformHandler(pool))
+	router.POST("/games", handlers.CreateGameHandler(pool))
+	router.GET("/games", handlers.GetAllGamesHandler(pool))
+	router.GET("/games/:id", handlers.GetGameHandler(pool))
+	router.PUT("/games/:id", handlers.UpdateGameHandler(pool))
+	router.DELETE("/games/:id", handlers.DeleteGameHandler(pool))
 
 	// Health check endpoint: reports whether the database connection is alive
 	router.GET("/health", func(c *gin.Context) {
