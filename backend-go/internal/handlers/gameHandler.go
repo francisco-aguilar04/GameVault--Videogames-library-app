@@ -3,6 +3,7 @@ package handlers
 import (
 	"gamevault-backend/internal/models"
 	"gamevault-backend/internal/repository"
+	"gamevault-backend/internal/service"
 	"net/http"
 	"strconv"
 
@@ -22,7 +23,7 @@ func CreateGameHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 			return
 		}
 
-		game, err = repository.CreateGame(pool, input)
+		game, err = service.CreateGame(pool, input)
 
 		if err != nil {
 
@@ -112,7 +113,7 @@ func UpdateGameHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		}
 
-		game, err = repository.UpdateGame(pool, id, input)
+		game, err = service.UpdateGame(pool, id, input)
 
 		if err != nil {
 
