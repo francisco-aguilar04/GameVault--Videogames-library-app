@@ -5,7 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"gamevault-backend/internal/models"
+	"gamevault-backend/main/models"
 )
 
 func CreatePlatform(pool *pgxpool.Pool, name string) (models.Platform, error) {

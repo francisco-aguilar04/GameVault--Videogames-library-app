@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"gamevault-backend/db"
-	"gamevault-backend/internal/handlers"
+	"gamevault-backend/main/handlers"
 )
 
 func main() {

@@ -1,24 +1,21 @@
 package handlers
 
 import (
+	"gamevault-backend/main/models"
+	"gamevault-backend/main/repository"
+	"gamevault-backend/main/service"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
-
-	"gamevault-backend/internal/models"
-	"gamevault-backend/internal/repository"
 )
 
-// Pool is captured with closure, so the internal handler
-// has access to it without using a global variable.
-
-func CreatePlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+func CreateGameHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var input models.Platform
+		var input models.Game
 		var err error
-		var platform models.Platform
+		var game models.Game
 
 		err = c.ShouldBindJSON(&input)
 		if err != nil {
@@ -26,90 +23,134 @@ func CreatePlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 			return
 		}
 
-		platform, err = repository.CreatePlatform(pool, input.Name)
+		game, err = service.CreateGame(pool, input)
+
 		if err != nil {
+
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
 			return
+
 		}
 
 		// 201 Created: the operation created a resource, so we retrieve it
-		c.JSON(http.StatusCreated, platform)
+		c.JSON(http.StatusCreated, game)
 	}
 }
 
-func GetPlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+func GetGameHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+
 	return func(c *gin.Context) {
+
 		var id int
 		var err error
-		var platform models.Platform
+		var game models.Game
 
-		// c.Param always retrieves text, even though it appears as a number in the URL,
-		// thats why we transform it with strconv.Atoi.
 		id, err = strconv.Atoi(c.Param("id"))
+
 		if err != nil {
+
 			c.JSON(http.StatusBadRequest, gin.H{"Error": "invalid id"})
 			return
+
 		}
 
-		platform, err = repository.GetPlatformByID(pool, id)
+		game, err = repository.GetGameByID(pool, id)
+
 		if err != nil {
-			// Any repository error comes here as "not found",without distinguishing
-			// pgx.ErrNoRows from real db connection errors.
-			c.JSON(http.StatusNotFound, gin.H{"Error": "platform not found"})
+
+			c.JSON(http.StatusNotFound, gin.H{"Error": "game not found"})
 			return
+
 		}
 
-		c.JSON(http.StatusOK, platform)
+		c.JSON(http.StatusOK, game)
 	}
 }
 
-func UpdatePlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+func GetAllGamesHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		var games []models.Game
+		var err error
+
+		games, err = repository.GetAllGames(pool)
+
+		if err != nil {
+
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+
+		}
+
+		c.JSON(http.StatusOK, games)
+	}
+}
+
+func UpdateGameHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
 		var id int
 		var err error
-		var input models.Platform
-		var platform models.Platform
+		var input models.Game
+		var game models.Game
 
 		id, err = strconv.Atoi(c.Param("id"))
+
 		if err != nil {
+
 			c.JSON(http.StatusBadRequest, gin.H{"Error": "invalid ID"})
 			return
+
 		}
 
 		err = c.ShouldBindJSON(&input)
+
 		if err != nil {
+
 			c.JSON(http.StatusBadRequest, gin.H{"Error": "invalid JSON"})
 			return
+
 		}
 
-		platform, err = repository.UpdatePlatform(pool, id, input.Name)
+		game, err = service.UpdateGame(pool, id, input)
+
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"Error": "platform not found"})
+
+			c.JSON(http.StatusNotFound, gin.H{"Error": "game not found"})
 			return
+
 		}
 
-		c.JSON(http.StatusOK, platform)
+		c.JSON(http.StatusOK, game)
 	}
 }
 
-func DeletePlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+func DeleteGameHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+
 	return func(c *gin.Context) {
+
 		var id int
 		var err error
 
 		id, err = strconv.Atoi(c.Param("id"))
+
 		if err != nil {
+
 			c.JSON(http.StatusBadRequest, gin.H{"Error": "invalid ID"})
 			return
+
 		}
 
-		err = repository.DeletePlatform(pool, id)
+		err = repository.DeleteGame(pool, id)
+
 		if err != nil {
+
 			c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
 			return
+
 		}
 
-		// 204 No Content: the operation was succesful but there are nothing to retrieve
 		c.Status(http.StatusNoContent)
 	}
 }
