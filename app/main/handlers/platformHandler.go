@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"gamevault-backend/internal/models"
-	"gamevault-backend/internal/repository"
+	"gamevault-backend/main/models"
+	"gamevault-backend/main/repository"
 )
 
 // Pool is captured with closure, so the internal handler
@@ -60,6 +60,21 @@ func GetPlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, platform)
+	}
+}
+
+func GetAllPlatformsHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var platforms []models.Platform
+		var err error
+
+		platforms, err = repository.GetAllPlatforms(pool)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, platforms)
 	}
 }
 

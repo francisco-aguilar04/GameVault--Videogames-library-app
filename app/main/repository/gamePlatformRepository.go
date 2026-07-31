@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"gamevault-backend/internal/models"
+	"gamevault-backend/main/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"

@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"gamevault-backend/internal/models"
-	"gamevault-backend/internal/repository"
-	"gamevault-backend/internal/service"
+	"gamevault-backend/main/models"
+	"gamevault-backend/main/repository"
+	"gamevault-backend/main/service"
 	"net/http"
 	"strconv"
 
