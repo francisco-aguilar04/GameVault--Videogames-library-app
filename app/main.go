@@ -45,6 +45,7 @@ func main() {
 	router.GET("/platforms/:id", handlers.GetPlatformHandler(pool))
 	router.GET("/platforms", handlers.GetAllPlatformsHandler(pool))
 	router.PUT("/platforms/:id", handlers.UpdatePlatformHandler(pool))
+	router.GET("/genres", handlers.GetAllGenresHandler(pool))
 	router.POST("/games", handlers.CreateGameHandler(pool))
 	router.GET("/games", handlers.GetAllGamesHandler(pool))
 	router.GET("/games/:id", handlers.GetGameHandler(pool))

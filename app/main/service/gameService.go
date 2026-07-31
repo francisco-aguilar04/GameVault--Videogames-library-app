@@ -35,6 +35,20 @@ func CreateGame(pool *pgxpool.Pool, input models.Game) (models.Game, error) {
 		game.PlatformIDs = input.PlatformIDs
 	}
 
+	if len(input.GenreIDs) > 0 {
+
+		err = repository.AddGenresToGame(pool, game.ID, input.GenreIDs)
+
+		if err != nil {
+
+			return models.Game{}, err
+
+		}
+
+		game.GenreIDs = input.GenreIDs
+
+	}
+
 	return game, nil
 }
 
@@ -72,6 +86,27 @@ func UpdateGame(pool *pgxpool.Pool, id int, input models.Game) (models.Game, err
 		}
 
 		game.PlatformIDs = input.PlatformIDs
+	}
+
+	if len(input.GenreIDs) > 0 {
+
+		err = repository.RemoveAllGenresFromGame(pool, id)
+
+		if err != nil {
+
+			return models.Game{}, err
+
+		}
+
+		err = repository.AddGenresToGame(pool, id, input.GenreIDs)
+
+		if err != nil {
+
+			return models.Game{}, err
+
+		}
+
+		game.GenreIDs = input.GenreIDs
 	}
 
 	return game, nil
