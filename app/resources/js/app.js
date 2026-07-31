@@ -1,9 +1,12 @@
 async function loadGames() {
 	var gamesResponse;
 	var platformsResponse;
+	var genresResponse;
 	var games;
 	var platformsList;
+	var genresList;
 	var platformMap = {};
+	var genreMap = {};
 
 	gamesResponse = await fetch("/games");
 	games = await gamesResponse.json();
@@ -11,16 +14,25 @@ async function loadGames() {
 	platformsResponse = await fetch("/platforms");
 	platformsList = await platformsResponse.json();
 
+	genresResponse = await fetch("/genres");
+	genresList = await genresResponse.json();
+
 	if (platformsList) {
 		platformsList.forEach(function (p) {
 			platformMap[p.id] = p.name;
 		});
 	}
 
-	renderGames(games, platformMap);
+	if (genresList) {
+		genresList.forEach(function (g) {
+			genreMap[g.id] = g.name;
+		});
+	}
+
+	renderGames(games, platformMap, genreMap);
 }
 
-function renderGames(games, platformMap) {
+function renderGames(games, platformMap, genreMap) {
 	var gridEl = document.getElementById("games-grid");
 
 	if (!games || games.length === 0) {
@@ -30,11 +42,11 @@ function renderGames(games, platformMap) {
 
 	gridEl.innerHTML = "";
 	games.forEach(function (game) {
-		gridEl.appendChild(buildGameCard(game, platformMap));
+		gridEl.appendChild(buildGameCard(game, platformMap, genreMap));
 	});
 }
 
-function buildGameCard(game, platformMap) {
+function buildGameCard(game, platformMap, genreMap) {
 	var template = document.getElementById("game-card-template");
 	var clone = template.content.cloneNode(true);
 
@@ -58,6 +70,17 @@ function buildGameCard(game, platformMap) {
 			pill.className = "badge bg-primary bg-opacity-50 me-1";
 			pill.textContent = name;
 			pillsEl.appendChild(pill);
+		}
+	});
+
+	var genresEl = clone.querySelector(".game-genres");
+	(game.genre_ids || []).forEach(function (id) {
+		var name = genreMap[id];
+		if (name) {
+			var badge = document.createElement("span");
+			badge.className = "badge bg-info bg-opacity-50 me-1";
+			badge.textContent = name;
+			genresEl.appendChild(badge);
 		}
 	});
 

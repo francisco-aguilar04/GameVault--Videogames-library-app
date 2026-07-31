@@ -1,16 +1,32 @@
-'''INSERT INTO games (title, rating, review, status, release_year, photo_url)
-VALUES ('Hollow Knight', 4.5, 'Precioso apartado artístico', 'completado', 2017, 'https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=300&h=400&fit=crop&auto=format');'''
+CREATE TABLE platforms (
+    id    SERIAL PRIMARY KEY,
+    name  VARCHAR(100) NOT NULL UNIQUE
+);
 
-'''INSERT INTO platforms (name) VALUES ('PC');'''
+CREATE TABLE games (
+    id            SERIAL PRIMARY KEY,
+    title         VARCHAR(255) NOT NULL,
+    rating        NUMERIC(2,1) CHECK (rating >= 0 AND rating <= 5 AND (rating * 2) = FLOOR(rating * 2)),
+    review        TEXT,
+    status        VARCHAR(20) NOT NULL DEFAULT 'pendiente' CHECK (status IN ('pendiente', 'jugando', 'completado')),
+    release_year  SMALLINT CHECK (release_year > 1950),
+    photo_url     VARCHAR(500),
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
-'''INSERT INTO game_platforms (game_id, platform_id)
-VALUES (
-    (SELECT id FROM games WHERE title = 'Hollow Knight'),
-    (SELECT id FROM platforms WHERE name = 'PC')
-);'''
-UPDATE games 
-SET photo_url = 'UPDATE games 
-SET photo_url = 'https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=300&h=400&fit=crop&auto=format'
-WHERE title = 'Hollow Knight';'
-WHERE title = 'Hollow Knight';
+CREATE TABLE game_platforms (
+    game_id      INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+    platform_id  INTEGER NOT NULL REFERENCES platforms(id) ON DELETE RESTRICT,
+    PRIMARY KEY (game_id, platform_id)
+);
 
+CREATE TABLE genres (
+    id   SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE game_genres (
+    game_id  INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+    genre_id INTEGER NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+    PRIMARY KEY (game_id, genre_id)
+);

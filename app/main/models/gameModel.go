@@ -12,4 +12,5 @@ type Game struct {
 	PhotoURL    *string   `json:"photo_url"`
 	CreatedAt   time.Time `json:"created_at"`
 	PlatformIDs []int     `json:"platform_ids"`
+	GenreIDs    []int     `json:"genre_ids"`
 }
