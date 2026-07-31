@@ -63,6 +63,21 @@ func GetPlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	}
 }
 
+func GetAllPlatformsHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var platforms []models.Platform
+		var err error
+
+		platforms, err = repository.GetAllPlatforms(pool)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, platforms)
+	}
+}
+
 func UpdatePlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var id int

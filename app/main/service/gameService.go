@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"gamevault-backend/backend/models"
-	"gamevault-backend/backend/repository"
+	"gamevault-backend/main/models"
+	"gamevault-backend/main/repository"
 )
 
 // CreateGame creates a game and, if platform ids were provided,

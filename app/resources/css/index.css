@@ -1,0 +1,6 @@
+.game-cover {
+
+    object-fit: cover;
+    aspect-ratio: 4/3;
+    
+}

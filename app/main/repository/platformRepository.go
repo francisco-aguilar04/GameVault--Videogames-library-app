@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"gamevault-backend/main/models"
@@ -36,6 +37,31 @@ func GetPlatformByID(pool *pgxpool.Pool, id int) (models.Platform, error) {
 	}
 
 	return platform, nil
+}
+
+func GetAllPlatforms(pool *pgxpool.Pool) ([]models.Platform, error) {
+	var platforms []models.Platform
+	var err error
+	var rows pgx.Rows
+
+	sql := "SELECT id, name FROM platforms"
+
+	rows, err = pool.Query(context.Background(), sql)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var platform models.Platform
+		err = rows.Scan(&platform.ID, &platform.Name)
+		if err != nil {
+			return nil, err
+		}
+		platforms = append(platforms, platform)
+	}
+
+	return platforms, nil
 }
 
 func UpdatePlatform(pool *pgxpool.Pool, id int, name string) (models.Platform, error) {
