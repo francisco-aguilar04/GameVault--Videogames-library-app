@@ -22,12 +22,17 @@ header {
     border-bottom-color: #2a2650;
 }
 
+button {
+
+    background: linear-gradient(135deg, rgb(109, 91, 191) 0%, rgb(79, 142, 240) 100%);
+
+}
 
 .game-cover {
 
     object-fit: cover;
     aspect-ratio: 4/3;
-    
+
 }
 
 .game-title {
