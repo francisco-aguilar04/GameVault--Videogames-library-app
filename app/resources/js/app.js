@@ -106,14 +106,14 @@ function appendGenreBadges(container, genreIds, genreMap) {
 
 	for (i = 0; i < visibleCount; i++) {
 		var badge = document.createElement("span");
-		badge.className = "text-secondary small";
+		badge.className = "text-light text-opacity-50 small";
 		badge.textContent = names[i];
 		container.appendChild(badge);
 	}
 
 	if (hiddenCount > 0) {
 		var extra = document.createElement("span");
-		extra.className = "text-secondary small";
+		extra.className = "text-light text-opacity-50 small";
 		extra.textContent = "+" + hiddenCount;
 		container.appendChild(extra);
 	}

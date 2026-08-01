@@ -38,6 +38,7 @@ func main() {
 	router = gin.Default()
 
 	router.StaticFile("/favicon.ico", "./resources/favicon.ico")
+	router.Static("/img", "./resources/img")
 
 	router.Static("/resources", "./resources")
 	router.StaticFile("/", "./resources/index.html")
