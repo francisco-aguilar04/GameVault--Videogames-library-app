@@ -14,29 +14,39 @@
         <h1 class="h4 fw-bold mb-0">GameVault</h1>
     </header>
 
-    <main class="container-fluid py-4">
+    <main class="container-fluid py-4 px-4">
 
-        <div id="games-grid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
-            <p class="text-secondary">Cargando juegos...</p>
+        <div id="games-grid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 gy-4 gx-3">
+    
+            <div class="position-fixed top-50 start-50 translate-middle text-center w-100">
+                <p class="text-secondary fs-3 mb-0">Cargando juegos...</p>
+            </div>
+
         </div>
 
         <template id="game-card-template">
 
             <div class="col">
 
-                <div class="card bg-secondary shadow bg-opacity-25 border-secondary h-100">
+                <div class="card bg-secondary shadow bg-opacity-25 border-secondary rounded-4 h-100">
 
-                    <div class="position-relative">
+                    <div class="position-relative overflow-hidden">
                         <img class="card-img-top img-fluid game-cover">
                         <span class="badge position-absolute top-0 start-0 m-2 game-status"></span>
                     </div>
 
-                    <div class="card-body p-2">
-                        <p class="card-title fw-bold mb-1 fs-4 text-center text-light game-title"></p>
-                        <p class="game-genres"></p>
-                        <p class="text-secondary small mb-1 game-year"></p>
-                        <p class="mb-1 text-warning game-stars"></p>
-                        <div class="game-pills"></div>
+                    <div class="card-body p-3 d-flex flex-column">
+                        <p class="card-title fw-bold text-light text-center fs-5 mb-1 game-title"></p>
+
+                        <div class="d-flex align-items-center gap-2 mb-1 mt-auto game-meta-row">
+                            <span class="text-secondary small game-year"></span>
+                            <span class="text-secondary small game-separator">•</span>
+                            <div class="d-flex gap-1 game-genres"></div>
+                        </div>
+
+                        <div class="game-pills mb-2 mt-1"></div>
+
+                        <p class="mb-0 text-warning game-stars"></p>
                     </div>
 
                 </div>

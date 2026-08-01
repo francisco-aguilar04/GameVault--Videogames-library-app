@@ -1,6 +1,53 @@
+:root {
+
+    --bs-dark: #131128;
+    --bs-dark-rgb: 19, 17, 40;
+
+    --bs-box-shadow: 0 1rem 3rem rgba(75, 56, 211, 0.2);
+
+}
+
+
 .game-cover {
 
     object-fit: cover;
     aspect-ratio: 4/3;
     
+}
+
+.game-title {
+
+    min-height: 2.6em;
+    overflow: hidden;
+
+}
+
+.card {
+
+    transition: transform 0.3s ease;
+    overflow: hidden;
+
+}
+
+.card:hover {
+
+    transform: translateY(-7px);
+    outline: 1px solid #7975a7;
+    cursor: pointer;
+
+}
+
+.card img {
+
+    transition: transform 0.5s ease;
+
+    object-fit: cover;
+
+
+}
+
+.card:hover img {
+
+    transform: scale(1.1);
+
 }

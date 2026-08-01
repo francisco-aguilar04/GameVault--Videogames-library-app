@@ -1,3 +1,5 @@
+var MAX_VISIBLE_GENRES = 2;
+
 async function loadGames() {
 	var gamesResponse;
 	var platformsResponse;
@@ -58,8 +60,19 @@ function buildGameCard(game, platformMap, genreMap) {
 	statusEl.textContent = statusLabel(game.status);
 	statusEl.classList.add(statusBadgeClass(game.status));
 
-	clone.querySelector(".game-title").textContent = game.title;
-	clone.querySelector(".game-year").textContent = game.release_year || "Año desconocido";
+	clone.querySelector(".game-title").textContent = truncateTitle(game.title, 41);
+
+	var yearEl = clone.querySelector(".game-year");
+	var hasYear = !!game.release_year;
+	yearEl.textContent = game.release_year || "";
+	yearEl.style.display = hasYear ? "inline" : "none";
+
+	var genresEl = clone.querySelector(".game-genres");
+	var hasGenres = appendGenreBadges(genresEl, game.genre_ids, genreMap);
+
+	var separatorEl = clone.querySelector(".game-separator");
+	separatorEl.style.display = (hasYear && hasGenres) ? "inline" : "none";
+
 	clone.querySelector(".game-stars").innerHTML = buildStars(game.rating);
 
 	var pillsEl = clone.querySelector(".game-pills");
@@ -67,24 +80,45 @@ function buildGameCard(game, platformMap, genreMap) {
 		var name = platformMap[id];
 		if (name) {
 			var pill = document.createElement("span");
-			pill.className = "badge bg-primary bg-opacity-50 me-1";
+			pill.className = "badge bg-opacity-75 me-1 " + platformBadgeClass(name);
 			pill.textContent = name;
 			pillsEl.appendChild(pill);
 		}
 	});
 
-	var genresEl = clone.querySelector(".game-genres");
-	(game.genre_ids || []).forEach(function (id) {
-		var name = genreMap[id];
-		if (name) {
-			var badge = document.createElement("span");
-			badge.className = "badge bg-info bg-opacity-50 me-1";
-			badge.textContent = name;
-			genresEl.appendChild(badge);
-		}
-	});
-
 	return clone;
+}
+
+function appendGenreBadges(container, genreIds, genreMap) {
+	var ids = genreIds || [];
+	var names = [];
+	var i;
+
+	for (i = 0; i < ids.length; i++) {
+		var name = genreMap[ids[i]];
+		if (name) {
+			names.push(name);
+		}
+	}
+
+	var visibleCount = Math.min(names.length, MAX_VISIBLE_GENRES);
+	var hiddenCount = names.length - visibleCount;
+
+	for (i = 0; i < visibleCount; i++) {
+		var badge = document.createElement("span");
+		badge.className = "text-secondary small";
+		badge.textContent = names[i];
+		container.appendChild(badge);
+	}
+
+	if (hiddenCount > 0) {
+		var extra = document.createElement("span");
+		extra.className = "text-secondary small";
+		extra.textContent = "+" + hiddenCount;
+		container.appendChild(extra);
+	}
+
+	return names.length > 0;
 }
 
 function buildStars(rating) {
@@ -128,6 +162,32 @@ function statusLabel(status) {
 		completado: "Completado"
 	};
 	return labels[status] || status;
+}
+
+function truncateTitle(title, maxLength) {
+	if (title.length <= maxLength) {
+		return title;
+	}
+	return title.slice(0, maxLength - 1) + "…";
+}
+
+function platformBadgeClass(name) {
+	var lower = name.toLowerCase();
+
+	if (lower.indexOf("switch") !== -1 || lower.indexOf("nintendo") !== -1) {
+		return "bg-danger";
+	}
+	if (lower.indexOf("xbox") !== -1) {
+		return "bg-success";
+	}
+	if (lower.indexOf("ps") !== -1 || lower.indexOf("playstation") !== -1) {
+		return "bg-primary";
+	}
+	if (lower.indexOf("pc") !== -1) {
+		return "bg-secondary";
+	}
+
+	return "bg-dark";
 }
 
 loadGames();
