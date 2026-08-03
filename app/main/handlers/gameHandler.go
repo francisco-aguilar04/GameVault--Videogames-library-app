@@ -68,6 +68,35 @@ func GetGameHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	}
 }
 
+func GetGamesByStatusHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+
+		var games []models.Game
+		var err error
+
+		status := c.Param("status")
+
+		games, err = service.GetGamesByStatus(pool, status)
+
+		if err != nil {
+
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+
+			return
+
+		}
+
+		if games == nil {
+
+			games = []models.Game{}
+
+		}
+
+		c.JSON(http.StatusOK, games)
+	}
+}
+
 func GetAllGamesHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 

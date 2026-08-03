@@ -111,3 +111,20 @@ func UpdateGame(pool *pgxpool.Pool, id int, input models.Game) (models.Game, err
 
 	return game, nil
 }
+
+func GetGamesByStatus(pool *pgxpool.Pool, status string) ([]models.Game, error) {
+
+	var games []models.Game
+	var err error
+
+	games, err = repository.GetGamesByStatus(pool, status)
+	if err != nil {
+		return nil, err
+	}
+
+	if games == nil {
+		games = []models.Game{}
+	}
+
+	return games, nil
+}

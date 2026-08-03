@@ -68,6 +68,76 @@ func GetGameByID(pool *pgxpool.Pool, id int) (models.Game, error) {
 	return game, nil
 }
 
+func GetGamesByStatus(pool *pgxpool.Pool, status string) ([]models.Game, error) {
+
+	var games []models.Game
+
+	sql := `SELECT id, title, rating, review, status, release_year, photo_url, 
+	               created_at FROM games WHERE status = $1`
+
+	rows, err := pool.Query(context.Background(), sql, status)
+
+	if err != nil {
+
+		return nil, err
+
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var game models.Game
+
+		err := rows.Scan(&game.ID, &game.Title, &game.Rating, &game.Review, &game.Status,
+			&game.ReleaseYear, &game.PhotoURL, &game.CreatedAt)
+
+		if err != nil {
+
+			return nil, err
+
+		}
+
+		platforms, err := GetPlatformsForGame(pool, game.ID)
+
+		if err != nil {
+
+			return nil, err
+
+		}
+
+		for _, p := range platforms {
+
+			game.PlatformIDs = append(game.PlatformIDs, p.ID)
+
+		}
+
+		genres, err := GetGenresForGame(pool, game.ID)
+
+		if err != nil {
+
+			return nil, err
+
+		}
+
+		for _, g := range genres {
+
+			game.GenreIDs = append(game.GenreIDs, g.ID)
+
+		}
+
+		games = append(games, game)
+	}
+
+	if err := rows.Err(); err != nil {
+
+		return nil, err
+
+	}
+
+	return games, nil
+}
+
 func GetAllGames(pool *pgxpool.Pool) ([]models.Game, error) {
 	var games []models.Game
 	var err error
