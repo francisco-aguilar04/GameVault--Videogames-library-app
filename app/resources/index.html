@@ -24,7 +24,7 @@
         <div class="container mb-4 mx-0">
             <div class="row">
 
-                <div class="col-auto px-0">
+                <div class="col-auto ps-0">
 
                     <div class="input-group">
 
@@ -38,7 +38,7 @@
 
                 </div>
 
-                <div class="col-auto d-flex">
+                <div class="col-auto d-flex px-0">
 
                     <button type="button"
                         class="btn btn-primary btn-sm text-white fw-bold rounded-3 px-2 py-1 shadow-sm me-1"
@@ -55,6 +55,14 @@
                     <button type="button"
                         class="btn btn-primary btn-sm text-white fw-bold rounded-3 px-2 py-1 shadow-sm ms-1"
                         onclick="filterGamesByStatus('pendiente')">Sin jugar</button>
+
+                </div>
+
+                <div class="col-auto">
+
+                    <select id="platform-filter" class="form-select" onchange="filterGamesByPlatform(this.value)">
+                        <option value="">Todas las plataformas</option>
+                    </select>
 
                 </div>
 

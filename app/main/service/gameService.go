@@ -145,3 +145,19 @@ func GetGamesByTitle(pool *pgxpool.Pool, title string) ([]models.Game, error) {
 
 	return games, nil
 }
+
+func GetGamesByPlatform(pool *pgxpool.Pool, platformID int) ([]models.Game, error) {
+	var games []models.Game
+	var err error
+
+	games, err = repository.GetGamesByPlatform(pool, platformID)
+	if err != nil {
+		return nil, err
+	}
+
+	if games == nil {
+		games = []models.Game{}
+	}
+
+	return games, nil
+}

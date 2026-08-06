@@ -120,6 +120,52 @@ document.getElementById("title-search").addEventListener("keydown", function (e)
 	}
 });
 
+
+async function filterGamesByPlatform(platformId) {
+	var endpoint;
+	var response;
+	var games;
+	var gridEl;
+
+	await loadMaps();
+
+	endpoint = platformId ? "/games/platform/" + platformId : "/games";
+
+	try {
+		response = await fetch(endpoint);
+
+		if (!response.ok) {
+			throw new Error("Error en la respuesta del servidor");
+		}
+
+		games = await response.json();
+
+		renderGames(games, platformMap, genreMap);
+
+	} catch (err) {
+		console.error(err);
+
+		gridEl = document.getElementById("games-grid");
+
+		gridEl.innerHTML = '<p class="text-danger">Error al cargar los juegos filtrados.</p>';
+	}
+}
+
+function populatePlatformFilter() {
+
+	var selectEl = document.getElementById("platform-filter");
+	var id;
+
+	for (id in platformMap) {
+
+		var option = document.createElement("option");
+
+		option.value = id;
+		option.textContent = platformMap[id];
+		selectEl.appendChild(option);
+	}
+}
+
 // Gamecards building
 
 function renderGames(games, platformMap, genreMap) {
@@ -318,5 +364,17 @@ function platformBadgeClass(name) {
 
 	return "bg-dark";
 }
+
+document.addEventListener("DOMContentLoaded", async function () {
+	try {
+
+		await loadMaps();
+
+		populatePlatformFilter();
+
+	} catch (error) {
+		console.error("Error al inicializar la página:", error);
+	}
+});
 
 loadGames();
