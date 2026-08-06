@@ -44,7 +44,9 @@ async function loadGames() {
 	renderGames(games, platformMap, genreMap);
 }
 
-async function filterGames(status) {
+// Filters
+
+async function filterGamesByStatus(status) {
 	var endpoint;
 	var response;
 	var games;
@@ -73,6 +75,52 @@ async function filterGames(status) {
 		gridEl.innerHTML = '<p class="text-danger">Error al cargar los juegos filtrados.</p>';
 	}
 }
+
+async function filterGamesByTitle(title) {
+	var endpoint;
+	var response;
+	var games;
+	var gridEl;
+
+	await loadMaps();
+
+	endpoint = title ? "/games/title/" + encodeURIComponent(title) : "/games";
+
+	try {
+		response = await fetch(endpoint);
+
+		if (!response.ok) {
+			throw new Error("Error en la respuesta del servidor");
+		}
+
+		games = await response.json();
+
+		renderGames(games, platformMap, genreMap);
+
+	} catch (err) {
+		console.error(err);
+
+		gridEl = document.getElementById("games-grid");
+
+		gridEl.innerHTML = '<p class="text-danger">Error al cargar los juegos filtrados.</p>';
+	}
+}
+
+function handleTitleSearch() {
+
+	var inputEl = document.getElementById("title-search");
+	var title = inputEl.value.trim();
+
+	filterGamesByTitle(title);
+}
+
+document.getElementById("title-search").addEventListener("keydown", function (e) {
+	if (e.key === "Enter") {
+		handleTitleSearch();
+	}
+});
+
+// Gamecards building
 
 function renderGames(games, platformMap, genreMap) {
 	var gridEl;

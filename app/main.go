@@ -54,6 +54,7 @@ func main() {
 
 	router.GET("/games", handlers.GetAllGamesHandler(pool))
 	router.GET("/games/status/:status", handlers.GetGamesByStatusHandler(pool))
+	router.GET("/games/title/:title", handlers.GetGamesByTitleHandler(pool))
 	router.GET("/games/:id", handlers.GetGameHandler(pool))
 
 	router.POST("/games", handlers.CreateGameHandler(pool))

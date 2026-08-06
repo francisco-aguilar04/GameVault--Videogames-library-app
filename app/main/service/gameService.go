@@ -128,3 +128,20 @@ func GetGamesByStatus(pool *pgxpool.Pool, status string) ([]models.Game, error) 
 
 	return games, nil
 }
+
+func GetGamesByTitle(pool *pgxpool.Pool, title string) ([]models.Game, error) {
+
+	var games []models.Game
+	var err error
+
+	games, err = repository.GetGamesByTitle(pool, title)
+	if err != nil {
+		return nil, err
+	}
+
+	if games == nil {
+		games = []models.Game{}
+	}
+
+	return games, nil
+}
