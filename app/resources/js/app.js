@@ -6,6 +6,8 @@ var mapsLoaded = false;
 var currentGames = [];
 var sortAscending = true;
 
+var ratingSortAscending = true;
+
 async function loadMaps() {
 	var platformsResponse;
 	var platformsList;
@@ -189,6 +191,29 @@ function sortGames(games) {
 	sorted.sort(function (a, b) {
 		var comparison = a.title.localeCompare(b.title);
 		return sortAscending ? comparison : -comparison;
+	});
+
+	return sorted;
+}
+
+function toggleRatingSort() {
+	ratingSortAscending = !ratingSortAscending;
+
+	var buttonEl = document.getElementById("rating-sort-toggle");
+	var iconEl = buttonEl.querySelector("i");
+	iconEl.className = ratingSortAscending ? "bi bi-arrow-down" : "bi bi-arrow-up";
+
+	renderGames(sortGamesByRating(currentGames), platformMap, genreMap);
+}
+
+function sortGamesByRating(games) {
+	var sorted = games.slice();
+
+	sorted.sort(function (a, b) {
+		var ratingA = a.rating === null ? -1 : a.rating;
+		var ratingB = b.rating === null ? -1 : b.rating;
+		var comparison = ratingA - ratingB;
+		return ratingSortAscending ? comparison : -comparison;
 	});
 
 	return sorted;
