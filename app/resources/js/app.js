@@ -3,6 +3,9 @@ var platformMap = {};
 var genreMap = {};
 var mapsLoaded = false;
 
+var currentGames = [];
+var sortAscending = true;
+
 async function loadMaps() {
 	var platformsResponse;
 	var platformsList;
@@ -41,7 +44,8 @@ async function loadGames() {
 	gamesResponse = await fetch("/games");
 	games = await gamesResponse.json();
 
-	renderGames(games, platformMap, genreMap);
+	currentGames = games;
+	renderGames(sortGames(currentGames), platformMap, genreMap);
 }
 
 // Filters
@@ -65,7 +69,8 @@ async function filterGamesByStatus(status) {
 
 		games = await response.json();
 
-		renderGames(games, platformMap, genreMap);
+		currentGames = games;
+		renderGames(sortGames(currentGames), platformMap, genreMap);
 
 	} catch (err) {
 		console.error(err);
@@ -95,7 +100,8 @@ async function filterGamesByTitle(title) {
 
 		games = await response.json();
 
-		renderGames(games, platformMap, genreMap);
+		currentGames = games;
+		renderGames(sortGames(currentGames), platformMap, genreMap);
 
 	} catch (err) {
 		console.error(err);
@@ -140,7 +146,8 @@ async function filterGamesByPlatform(platformId) {
 
 		games = await response.json();
 
-		renderGames(games, platformMap, genreMap);
+		currentGames = games;
+		renderGames(sortGames(currentGames), platformMap, genreMap);
 
 	} catch (err) {
 		console.error(err);
@@ -164,6 +171,27 @@ function populatePlatformFilter() {
 		option.textContent = platformMap[id];
 		selectEl.appendChild(option);
 	}
+}
+
+
+function toggleSort() {
+	sortAscending = !sortAscending;
+
+	var iconEl = document.querySelector("#sort-toggle i");
+	iconEl.className = sortAscending ? "bi bi-arrow-down" : "bi bi-arrow-up";
+
+	renderGames(sortGames(currentGames), platformMap, genreMap);
+}
+
+function sortGames(games) {
+	var sorted = games.slice();
+
+	sorted.sort(function (a, b) {
+		var comparison = a.title.localeCompare(b.title);
+		return sortAscending ? comparison : -comparison;
+	});
+
+	return sorted;
 }
 
 // Gamecards building
