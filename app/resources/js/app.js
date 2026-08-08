@@ -1,17 +1,20 @@
 var MAX_VISIBLE_GENRES = 2;
+var platformMap = {};
+var genreMap = {};
+var mapsLoaded = false;
 
-async function loadGames() {
-	var gamesResponse;
+var currentGames = [];
+var sortAscending = true;
+
+var ratingSortAscending = true;
+
+async function loadMaps() {
 	var platformsResponse;
-	var genresResponse;
-	var games;
 	var platformsList;
+	var genresResponse;
 	var genresList;
-	var platformMap = {};
-	var genreMap = {};
 
-	gamesResponse = await fetch("/games");
-	games = await gamesResponse.json();
+	if (mapsLoaded) return;
 
 	platformsResponse = await fetch("/platforms");
 	platformsList = await platformsResponse.json();
@@ -31,55 +34,261 @@ async function loadGames() {
 		});
 	}
 
-	renderGames(games, platformMap, genreMap);
+	mapsLoaded = true;
 }
 
+async function loadGames() {
+	var gamesResponse;
+	var games;
+
+	await loadMaps();
+
+	gamesResponse = await fetch("/games");
+	games = await gamesResponse.json();
+
+	currentGames = games;
+	renderGames(sortGames(currentGames), platformMap, genreMap);
+}
+
+// Filters
+
+async function filterGamesByStatus(status) {
+	var endpoint;
+	var response;
+	var games;
+	var gridEl;
+
+	await loadMaps();
+
+	endpoint = (status === 'todos' || !status) ? "/games" : "/games/status/" + status;
+
+	try {
+		response = await fetch(endpoint);
+
+		if (!response.ok) {
+			throw new Error("Error en la respuesta del servidor");
+		}
+
+		games = await response.json();
+
+		currentGames = games;
+		renderGames(sortGames(currentGames), platformMap, genreMap);
+
+	} catch (err) {
+		console.error(err);
+
+		gridEl = document.getElementById("games-grid");
+
+		gridEl.innerHTML = '<p class="text-danger">Error al cargar los juegos filtrados.</p>';
+	}
+}
+
+async function filterGamesByTitle(title) {
+	var endpoint;
+	var response;
+	var games;
+	var gridEl;
+
+	await loadMaps();
+
+	endpoint = title ? "/games/title/" + encodeURIComponent(title) : "/games";
+
+	try {
+		response = await fetch(endpoint);
+
+		if (!response.ok) {
+			throw new Error("Error en la respuesta del servidor");
+		}
+
+		games = await response.json();
+
+		currentGames = games;
+		renderGames(sortGames(currentGames), platformMap, genreMap);
+
+	} catch (err) {
+		console.error(err);
+
+		gridEl = document.getElementById("games-grid");
+
+		gridEl.innerHTML = '<p class="text-danger">Error al cargar los juegos filtrados.</p>';
+	}
+}
+
+function handleTitleSearch() {
+
+	var inputEl = document.getElementById("title-search");
+	var title = inputEl.value.trim();
+
+	filterGamesByTitle(title);
+}
+
+document.getElementById("title-search").addEventListener("keydown", function (e) {
+	if (e.key === "Enter") {
+		handleTitleSearch();
+	}
+});
+
+
+async function filterGamesByPlatform(platformId) {
+	var endpoint;
+	var response;
+	var games;
+	var gridEl;
+
+	await loadMaps();
+
+	endpoint = platformId ? "/games/platform/" + platformId : "/games";
+
+	try {
+		response = await fetch(endpoint);
+
+		if (!response.ok) {
+			throw new Error("Error en la respuesta del servidor");
+		}
+
+		games = await response.json();
+
+		currentGames = games;
+		renderGames(sortGames(currentGames), platformMap, genreMap);
+
+	} catch (err) {
+		console.error(err);
+
+		gridEl = document.getElementById("games-grid");
+
+		gridEl.innerHTML = '<p class="text-danger">Error al cargar los juegos filtrados.</p>';
+	}
+}
+
+function populatePlatformFilter() {
+
+	var selectEl = document.getElementById("platform-filter");
+	var id;
+
+	for (id in platformMap) {
+
+		var option = document.createElement("option");
+
+		option.value = id;
+		option.textContent = platformMap[id];
+		selectEl.appendChild(option);
+	}
+}
+
+
+function toggleSort() {
+	sortAscending = !sortAscending;
+
+	var iconEl = document.querySelector("#sort-toggle i");
+	iconEl.className = sortAscending ? "bi bi-arrow-down" : "bi bi-arrow-up";
+
+	renderGames(sortGames(currentGames), platformMap, genreMap);
+}
+
+function sortGames(games) {
+	var sorted = games.slice();
+
+	sorted.sort(function (a, b) {
+		var comparison = a.title.localeCompare(b.title);
+		return sortAscending ? comparison : -comparison;
+	});
+
+	return sorted;
+}
+
+function toggleRatingSort() {
+	ratingSortAscending = !ratingSortAscending;
+
+	var buttonEl = document.getElementById("rating-sort-toggle");
+	var iconEl = buttonEl.querySelector("i");
+	iconEl.className = ratingSortAscending ? "bi bi-arrow-down" : "bi bi-arrow-up";
+
+	renderGames(sortGamesByRating(currentGames), platformMap, genreMap);
+}
+
+function sortGamesByRating(games) {
+	var sorted = games.slice();
+
+	sorted.sort(function (a, b) {
+		var ratingA = a.rating === null ? -1 : a.rating;
+		var ratingB = b.rating === null ? -1 : b.rating;
+		var comparison = ratingA - ratingB;
+		return ratingSortAscending ? comparison : -comparison;
+	});
+
+	return sorted;
+}
+
+// Gamecards building
+
 function renderGames(games, platformMap, genreMap) {
-	var gridEl = document.getElementById("games-grid");
+	var gridEl;
+
+	gridEl = document.getElementById("games-grid");
 
 	if (!games || games.length === 0) {
-		gridEl.innerHTML = '<p class="text-secondary">Todavía no hay juegos en tu biblioteca.</p>';
+		gridEl.innerHTML = '<p class="text-secondary">No se encontraron juegos en esta sección.</p>';
 		return;
 	}
 
 	gridEl.innerHTML = "";
+
 	games.forEach(function (game) {
 		gridEl.appendChild(buildGameCard(game, platformMap, genreMap));
 	});
 }
 
 function buildGameCard(game, platformMap, genreMap) {
-	var template = document.getElementById("game-card-template");
-	var clone = template.content.cloneNode(true);
+	var template;
+	var clone;
+	var img;
+	var statusEl;
+	var yearEl;
+	var hasYear;
+	var genresEl;
+	var hasGenres;
+	var separatorEl;
+	var pillsEl;
 
-	var img = clone.querySelector(".game-cover");
+	template = document.getElementById("game-card-template");
+	clone = template.content.cloneNode(true);
+
+	img = clone.querySelector(".game-cover");
 	img.src = game.photo_url || "https://placehold.co/300x400?text=Sin+portada";
 	img.alt = game.title;
 
-	var statusEl = clone.querySelector(".game-status");
+	statusEl = clone.querySelector(".game-status");
 	statusEl.textContent = statusLabel(game.status);
 	statusEl.classList.add(statusBadgeClass(game.status));
 
 	clone.querySelector(".game-title").textContent = truncateTitle(game.title, 41);
 
-	var yearEl = clone.querySelector(".game-year");
-	var hasYear = !!game.release_year;
+	yearEl = clone.querySelector(".game-year");
+	hasYear = !!game.release_year;
 	yearEl.textContent = game.release_year || "";
 	yearEl.style.display = hasYear ? "inline" : "none";
 
-	var genresEl = clone.querySelector(".game-genres");
-	var hasGenres = appendGenreBadges(genresEl, game.genre_ids, genreMap);
+	genresEl = clone.querySelector(".game-genres");
+	genresEl.innerHTML = "";
 
-	var separatorEl = clone.querySelector(".game-separator");
+	hasGenres = appendGenreBadges(genresEl, game.genre_ids, genreMap);
+
+	separatorEl = clone.querySelector(".game-separator");
 	separatorEl.style.display = (hasYear && hasGenres) ? "inline" : "none";
 
 	clone.querySelector(".game-stars").innerHTML = buildStars(game.rating);
 
-	var pillsEl = clone.querySelector(".game-pills");
+	pillsEl = clone.querySelector(".game-pills");
+	pillsEl.innerHTML = "";
+
 	(game.platform_ids || []).forEach(function (id) {
-		var name = platformMap[id];
+		var name;
+		var pill;
+
+		name = platformMap[id];
+
 		if (name) {
-			var pill = document.createElement("span");
+			pill = document.createElement("span");
 			pill.className = "badge bg-opacity-75 me-1 " + platformBadgeClass(name);
 			pill.textContent = name;
 			pillsEl.appendChild(pill);
@@ -90,29 +299,38 @@ function buildGameCard(game, platformMap, genreMap) {
 }
 
 function appendGenreBadges(container, genreIds, genreMap) {
-	var ids = genreIds || [];
-	var names = [];
+	var ids;
+	var names;
 	var i;
+	var name;
+	var visibleCount;
+	var hiddenCount;
+	var badge;
+	var extra;
+
+	ids = genreIds || [];
+	names = [];
 
 	for (i = 0; i < ids.length; i++) {
-		var name = genreMap[ids[i]];
+		name = genreMap[ids[i]];
+
 		if (name) {
 			names.push(name);
 		}
 	}
 
-	var visibleCount = Math.min(names.length, MAX_VISIBLE_GENRES);
-	var hiddenCount = names.length - visibleCount;
+	visibleCount = Math.min(names.length, MAX_VISIBLE_GENRES);
+	hiddenCount = names.length - visibleCount;
 
 	for (i = 0; i < visibleCount; i++) {
-		var badge = document.createElement("span");
+		badge = document.createElement("span");
 		badge.className = "text-light text-opacity-50 small";
 		badge.textContent = names[i];
 		container.appendChild(badge);
 	}
 
 	if (hiddenCount > 0) {
-		var extra = document.createElement("span");
+		extra = document.createElement("span");
 		extra.className = "text-light text-opacity-50 small";
 		extra.textContent = "+" + hiddenCount;
 		container.appendChild(extra);
@@ -122,24 +340,21 @@ function appendGenreBadges(container, genreIds, genreMap) {
 }
 
 function buildStars(rating) {
-	var value = rating || 0;
-	var html = "";
+	var value;
+	var html;
 	var i;
+
+	value = rating || 0;
+	html = "";
 
 	for (i = 1; i <= 5; i++) {
 
 		if (value >= i) {
-
 			html += '<i class="bi bi-star-fill"></i> ';
-
 		} else if (value >= i - 0.5) {
-
 			html += '<i class="bi bi-star-half"></i> ';
-
 		} else {
-
 			html += '<i class="bi bi-star"></i> ';
-
 		}
 	}
 
@@ -147,47 +362,72 @@ function buildStars(rating) {
 }
 
 function statusBadgeClass(status) {
-	var classes = {
+	var classes;
+
+	classes = {
 		pendiente: "bg-secondary",
 		jugando: "bg-primary",
 		completado: "bg-success"
 	};
+
 	return classes[status] || "bg-secondary";
 }
 
 function statusLabel(status) {
-	var labels = {
+	var labels;
+
+	labels = {
 		pendiente: "Sin jugar",
 		jugando: "Jugando",
 		completado: "Completado"
 	};
+
 	return labels[status] || status;
 }
 
 function truncateTitle(title, maxLength) {
+
 	if (title.length <= maxLength) {
 		return title;
 	}
+
 	return title.slice(0, maxLength - 1) + "…";
 }
 
 function platformBadgeClass(name) {
-	var lower = name.toLowerCase();
+	var lower;
+
+	lower = name.toLowerCase();
 
 	if (lower.indexOf("switch") !== -1 || lower.indexOf("nintendo") !== -1) {
 		return "bg-danger";
 	}
+
 	if (lower.indexOf("xbox") !== -1) {
 		return "bg-success";
 	}
+
 	if (lower.indexOf("ps") !== -1 || lower.indexOf("playstation") !== -1) {
 		return "bg-primary";
 	}
+
 	if (lower.indexOf("pc") !== -1) {
 		return "bg-secondary";
 	}
 
 	return "bg-dark";
 }
+
+document.addEventListener("DOMContentLoaded", async function () {
+	try {
+
+		await loadMaps();
+
+		populatePlatformFilter();
+
+	} catch (error) {
+		console.error("Error al inicializar la página:", error);
+	}
+});
 
 loadGames();
