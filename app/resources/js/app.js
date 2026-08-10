@@ -219,6 +219,34 @@ function sortGamesByRating(games) {
 	return sorted;
 }
 
+//Header
+
+async function loadHeader() {
+	var response;
+	var html;
+	var placeholder;
+
+	response = await fetch("/resources/partials/header.html");
+	html = await response.text();
+
+	placeholder = document.getElementById("header-placeholder");
+	placeholder.innerHTML = html;
+
+	markActiveLink();
+}
+
+function markActiveLink() {
+	var links = document.querySelectorAll("nav .nav-link");
+	var currentPath = window.location.pathname;
+	var i;
+
+	for (i = 0; i < links.length; i++) {
+		if (links[i].getAttribute("href") === currentPath) {
+			links[i].classList.add("fw-bold", "text-decoration-underline");
+		}
+	}
+}
+
 // Gamecards building
 
 function renderGames(games, platformMap, genreMap) {
@@ -430,4 +458,5 @@ document.addEventListener("DOMContentLoaded", async function () {
 	}
 });
 
+loadHeader();
 loadGames();
