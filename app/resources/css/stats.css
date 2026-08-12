@@ -2,3 +2,36 @@
     max-width: 900px;
     margin: 0 auto;
 }
+
+.stat-card {
+
+    background-color: var(--bs-dark);
+    border: 1px solid var(--bs-secondary);
+}
+
+.rating-bar-label {
+    width: 40px;
+    color: #e8e4ff;
+    font-size: 0.85rem;
+}
+
+.rating-bar-track {
+    height: 14px;
+    background-color: var(--bs-secondary);
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    background-color: #9370ff;
+    border-radius: 7px;
+    transition: width 0.3s;
+}
+
+.rating-bar-count {
+    width: 28px;
+    text-align: right;
+    color: #e8e4ff;
+    font-weight: bold;
+}

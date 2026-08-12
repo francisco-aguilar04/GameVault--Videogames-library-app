@@ -59,6 +59,7 @@ func main() {
 	router.GET("/games/:id", handlers.GetGameHandler(pool))
 
 	router.GET("/stats", handlers.GetStatsHandler(pool))
+	router.GET("/stats/rating-distribution", handlers.GetRatingDistributionHandler(pool))
 
 	router.POST("/games", handlers.CreateGameHandler(pool))
 	router.DELETE("/games/:id", handlers.DeleteGameHandler(pool))

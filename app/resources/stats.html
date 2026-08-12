@@ -19,51 +19,58 @@
     <div id="header-placeholder"></div>
 
     <main class="container-fluid py-4">
+
         <h2 class="h4 fw-bold mb-4">Estadísticas</h2>
 
         <div class="row row-cols-3 row-cols-md-4 row-cols-lg-3 row-cols-xl-3 g-3 justify-content-center">
             <div class="col">
-                <div class="card sidebar-panel h-100 text-center p-2 bg-secondary">
+                <div class="card stat-card h-100 text-center p-2 bg-secondary">
                     <p class="fs-4 text-white mb-1 text-uppercase opacity-75">Total juegos</p>
                     <p class="fs-2 fw-bold mb-0 text-white stat-total"></p>
                 </div>
             </div>
 
             <div class="col">
-                <div class="card sidebar-panel h-100 text-center p-2 bg-secondary">
+                <div class="card stat-card h-100 text-center p-2 bg-secondary">
                     <p class="fs-4 text-white mb-1 text-uppercase opacity-75">Completados</p>
                     <p class="fs-2 fw-bold mb-0 text-success stat-completed"></p>
                 </div>
             </div>
 
             <div class="col">
-                <div class="card sidebar-panel h-100 text-center p-2 bg-secondary">
+                <div class="card stat-card h-100 text-center p-2 bg-secondary">
                     <p class="fs-4 text-white mb-1 text-uppercase opacity-75">Jugando</p>
                     <p class="fs-2 fw-bold mb-0 text-primary stat-playing"></p>
                 </div>
             </div>
 
             <div class="col">
-                <div class="card sidebar-panel h-100 text-center p-2 bg-secondary">
+                <div class="card stat-card h-100 text-center p-2 bg-secondary">
                     <p class="fs-4 text-white mb-1 text-uppercase opacity-75">Sin jugar</p>
                     <p class="fs-2 fw-bold mb-0 text-danger stat-pending"></p>
                 </div>
             </div>
 
             <div class="col">
-                <div class="card sidebar-panel h-100 text-center p-2 bg-secondary">
+                <div class="card stat-card h-100 text-center p-2 bg-secondary">
                     <p class="fs-4 text-white mb-1 text-uppercase opacity-75">Media</p>
                     <p class="fs-2 fw-bold mb-0 text-warning stat-average"></p>
                 </div>
             </div>
 
             <div class="col">
-                <div class="card sidebar-panel h-100 text-center p-2 bg-secondary">
+                <div class="card stat-card h-100 text-center p-2 bg-secondary">
                     <p class="fs-4 text-white mb-1 text-uppercase opacity-75">Género top</p>
                     <p class="fs-2 fw-bold mb-0 text-info stat-top-genre"></p>
                 </div>
             </div>
         </div>
+
+        <div class="card stat-card p-3 mt-4" style="max-width: 500px;">
+            <p class="text-white text-uppercase fw-bold opacity-75 mb-3">Distribución de puntuaciones</p>
+            <div id="rating-bars"></div>
+        </div>
+
     </main>
 
 </body>

@@ -56,3 +56,45 @@ func GetStats(pool *pgxpool.Pool) (models.Stats, error) {
 
 	return stats, nil
 }
+
+func GetRatingDistribution(pool *pgxpool.Pool) (map[int]int, error) {
+
+	var distribution = map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+
+	sql := `SELECT ROUND(rating)::int AS bucket, COUNT(*) 
+			FROM games 
+			WHERE rating IS NOT NULL 
+			GROUP BY bucket`
+
+	rows, err := pool.Query(context.Background(), sql)
+
+	if err != nil {
+
+		return nil, err
+
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var bucket int
+		var count int
+
+		err = rows.Scan(&bucket, &count)
+
+		if err != nil {
+
+			return nil, err
+
+		}
+
+		if bucket >= 1 && bucket <= 5 {
+
+			distribution[bucket] = count
+
+		}
+	}
+
+	return distribution, nil
+}

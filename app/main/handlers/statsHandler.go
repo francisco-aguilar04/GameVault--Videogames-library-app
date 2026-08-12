@@ -20,3 +20,15 @@ func GetStatsHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 		c.JSON(http.StatusOK, stats)
 	}
 }
+
+func GetRatingDistributionHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var distribution, err = repository.GetRatingDistribution(pool)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, distribution)
+	}
+}
