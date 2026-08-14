@@ -1,0 +1,32 @@
+.btn-icon {
+    color: var(--bs-light);
+    border: 1px solid var(--bs-secondary);
+    border-radius: 8px;
+}
+
+.btn-icon:hover {
+    background-color: var(--bs-secondary);
+    color: var(--bs-light);
+}
+
+.sidebar-panel {
+    background-color: var(--bs-dark);
+    border-right: 1px solid var(--bs-secondary);
+}
+
+.sidebar-link {
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: var(--bs-light);
+    transition: background-color 0.15s;
+}
+
+.sidebar-link:hover {
+    background-color: var(--bs-secondary);
+    color: var(--bs-light);
+}
+
+.sidebar-link.active {
+    background-color: var(--bs-primary);
+    color: #fff;
+}

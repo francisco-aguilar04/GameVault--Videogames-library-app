@@ -71,3 +71,10 @@ button {
     transform: scale(1.1);
 
 }
+
+.offcanvas-backdrop.show {
+    --bs-backdrop-opacity: 1;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    background-color: rgba(5, 5, 15, 0.92);
+}
