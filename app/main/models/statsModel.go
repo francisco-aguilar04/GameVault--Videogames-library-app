@@ -8,3 +8,8 @@ type Stats struct {
 	AverageRating *float64 `json:"average_rating"`
 	TopGenre      *string  `json:"top_genre"`
 }
+
+type RankingItem struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}

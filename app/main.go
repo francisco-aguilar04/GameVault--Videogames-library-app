@@ -60,6 +60,8 @@ func main() {
 
 	router.GET("/stats", handlers.GetStatsHandler(pool))
 	router.GET("/stats/rating-distribution", handlers.GetRatingDistributionHandler(pool))
+	router.GET("/stats/top-platforms", handlers.GetTopPlatformsHandler(pool))
+	router.GET("/stats/top-genres", handlers.GetTopGenresHandler(pool))
 
 	router.POST("/games", handlers.CreateGameHandler(pool))
 	router.DELETE("/games/:id", handlers.DeleteGameHandler(pool))

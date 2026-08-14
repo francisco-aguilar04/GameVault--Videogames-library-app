@@ -78,6 +78,58 @@ function renderRatingChart(distribution) {
     }
 }
 
+async function loadPodiums() {
+    var platformsResponse;
+    var genresResponse;
+    var topPlatforms;
+    var topGenres;
+
+    platformsResponse = await fetch("/stats/top-platforms");
+    topPlatforms = await platformsResponse.json();
+
+    genresResponse = await fetch("/stats/top-genres");
+    topGenres = await genresResponse.json();
+
+    renderPodium("platform-podium", topPlatforms);
+    renderPodium("genre-podium", topGenres);
+}
+
+function renderPodium(containerId, items) {
+    var container = document.getElementById(containerId);
+    var ranks = ["rank-1", "rank-2", "rank-3"];
+    var i;
+
+    container.innerHTML = "";
+
+    if (!items || items.length === 0) {
+        container.innerHTML = '<p class="text-secondary">Sin datos todavía.</p>';
+        return;
+    }
+
+    for (i = 0; i < items.length && i < 3; i++) {
+        var step = document.createElement("div");
+        step.className = "podium-step " + ranks[i];
+
+        var name = document.createElement("p");
+        name.className = "podium-name";
+        name.textContent = items[i].name;
+
+        var count = document.createElement("p");
+        count.className = "podium-count";
+        count.textContent = items[i].count;
+
+        var bar = document.createElement("div");
+        bar.className = "podium-bar " + ranks[i];
+        bar.textContent = (i + 1) + "º";
+
+        step.appendChild(name);
+        step.appendChild(count);
+        step.appendChild(bar);
+        container.appendChild(step);
+    }
+}
+
 loadHeader();
 loadStats();
 loadRatingChart();
+loadPodiums();

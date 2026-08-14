@@ -98,3 +98,62 @@ func GetRatingDistribution(pool *pgxpool.Pool) (map[int]int, error) {
 
 	return distribution, nil
 }
+
+func GetTopPlatforms(pool *pgxpool.Pool, limit int) ([]models.RankingItem, error) {
+	var items []models.RankingItem
+
+	sql := `SELECT p.name, COUNT(*) AS total
+			FROM game_platforms gp
+			JOIN platforms p ON p.id = gp.platform_id
+			GROUP BY p.name
+			ORDER BY total DESC
+			LIMIT $1`
+
+	rows, err := pool.Query(context.Background(), sql, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item models.RankingItem
+		err = rows.Scan(&item.Name, &item.Count)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
+func GetTopGenres(pool *pgxpool.Pool, limit int) ([]models.RankingItem, error) {
+
+	var items []models.RankingItem
+
+	sql := `SELECT g.name, COUNT(*) AS total
+			FROM game_genres gg
+			JOIN genres g ON g.id = gg.genre_id
+			GROUP BY g.name
+			ORDER BY total DESC
+			LIMIT $1`
+
+	rows, err := pool.Query(context.Background(), sql, limit)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item models.RankingItem
+		err = rows.Scan(&item.Name, &item.Count)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
+}
