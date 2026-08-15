@@ -67,6 +67,8 @@ func main() {
 	router.DELETE("/games/:id", handlers.DeleteGameHandler(pool))
 	router.PUT("/games/:id", handlers.UpdateGameHandler(pool))
 
+	router.GET("/export/csv", handlers.ExportCSVHandler(pool))
+
 	// Health check endpoint: reports whether the database connection is alive
 	router.GET("/health", func(c *gin.Context) {
 		if pool == nil {
