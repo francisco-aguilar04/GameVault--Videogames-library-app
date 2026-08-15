@@ -1,0 +1,63 @@
+.accordion-item {
+    background-color: transparent;
+    border-color: var(--bs-secondary);
+}
+
+.accordion-button {
+    background-color: var(--bs-dark);
+    color: #fff;
+}
+
+.accordion-button:hover {
+    background-color: var(--bs-secondary);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--bs-secondary);
+    color: #fff;
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: var(--bs-secondary);
+}
+
+.accordion-button::after {
+
+    filter: invert(1) brightness(2);
+
+}
+
+.form-label {
+
+    color: #fff;
+
+}
+
+.rounded-table {
+
+    border-collapse: separate;
+    border-spacing: 0 6px;
+
+}
+
+.rounded-table td {
+
+    background-color: var(--bs-dark);
+
+}
+
+.rounded-table td:first-child {
+
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+
+}
+
+.rounded-table td:last-child {
+
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+
+}
