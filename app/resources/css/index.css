@@ -72,3 +72,15 @@ header {
     -webkit-backdrop-filter: blur(4px);
     background-color: rgba(5, 5, 15, 0.92);
 }
+
+.edit-hero {
+    overflow: hidden;
+    border-top-left-radius: var(--bs-modal-border-radius);
+    border-top-right-radius: var(--bs-modal-border-radius);
+}
+
+.edit-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 60%);
+}

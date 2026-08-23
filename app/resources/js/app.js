@@ -281,6 +281,13 @@ function buildGameCard(game, platformMap, genreMap) {
 	template = document.getElementById("game-card-template");
 	clone = template.content.cloneNode(true);
 
+	var cardEl = clone.querySelector(".card");
+	cardEl.setAttribute("data-id", game.id);
+	cardEl.style.cursor = "pointer";
+	cardEl.addEventListener("click", function () {
+		openEditModal(game.id);
+	});
+
 	img = clone.querySelector(".game-cover");
 	img.src = game.photo_url || "https://placehold.co/300x400?text=Sin+portada";
 	img.alt = game.title;
