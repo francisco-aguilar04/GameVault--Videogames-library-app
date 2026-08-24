@@ -336,6 +336,174 @@ async function handlePlatformDelete(event) {
     }
 }
 
+function renderAddGenreForm() {
+    var container = document.getElementById("add-genre-form");
+
+    container.innerHTML =
+        '<form id="genre-form" class="d-flex gap-2">' +
+        '<input type="text" id="genre-name-input" class="form-control" placeholder="Nombre del género" required maxlength="100">' +
+        '<button type="submit" class="btn btn-outline-primary">Añadir</button>' +
+        '</form>' +
+        '<p id="genre-form-message" class="mt-2 mb-0 small"></p>';
+
+    document.getElementById("genre-form").addEventListener("submit", handleAddGenre);
+}
+
+async function handleAddGenre(event) {
+    var nameInput;
+    var name;
+    var messageEl;
+    var response;
+    var result;
+
+    event.preventDefault();
+
+    nameInput = document.getElementById("genre-name-input");
+    name = nameInput.value.trim();
+    messageEl = document.getElementById("genre-form-message");
+
+    if (!name) {
+        return;
+    }
+
+    try {
+        response = await fetch("/genres", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name })
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al crear el género");
+        }
+
+        result = await response.json();
+
+        messageEl.className = "mt-2 mb-0 small text-success";
+        messageEl.textContent = "Género \"" + result.name + "\" añadido correctamente.";
+        nameInput.value = "";
+
+        renderGenresTable();
+
+    } catch (err) {
+        console.error(err);
+        messageEl.className = "mt-2 mb-0 small text-danger";
+        messageEl.textContent = "No se pudo añadir el género.";
+    }
+}
+
+async function renderGenresTable() {
+    var container = document.getElementById("genres-table");
+    var response;
+    var genresList;
+    var html;
+    var i;
+    var j;
+
+    response = await fetch("/genres");
+    genresList = await response.json();
+
+    if (!genresList || genresList.length === 0) {
+        container.innerHTML = '<p class="text-secondary small">No hay géneros todavía.</p>';
+        return;
+    }
+
+    html = `<table class="table table-sm align-middle table-borderless rounded-table w-75" style="border-collapse: separate; border-spacing: 12px 12px;">`;
+
+    for (i = 0; i < genresList.length; i += 4) {
+        html += `<tr>`;
+
+        for (j = i; j < i + 4 && j < genresList.length; j++) {
+            html += `
+			<td class="p-0" data-id="${genresList[j].id}">
+				<div class="input-group input-group-sm w-100">
+					<input type="text" class="form-control genre-name-input" value="${genresList[j].name}" maxlength="100">
+					<button class="btn btn-success genre-save-btn" type="button" title="Guardar"><i class="bi bi-check"></i></button>
+					<button class="btn btn-danger genre-delete-btn me-5" type="button" title="Borrar"><i class="bi bi-trash"></i></button>
+				</div>
+			</td>
+		`;
+        }
+
+        html += `</tr>`;
+    }
+    html += `</table>`;
+
+    container.innerHTML = html;
+
+    container.querySelectorAll(".genre-save-btn").forEach(function (btn) {
+        btn.addEventListener("click", handleGenreSave);
+    });
+
+    container.querySelectorAll(".genre-delete-btn").forEach(function (btn) {
+        btn.addEventListener("click", handleGenreDelete);
+    });
+}
+
+async function handleGenreSave(event) {
+    var cell;
+    var id;
+    var input;
+    var newName;
+    var response;
+
+    cell = event.target.closest("td");
+    id = cell.getAttribute("data-id");
+    input = cell.querySelector(".genre-name-input");
+    newName = input.value.trim();
+
+    if (!newName) {
+        return;
+    }
+
+    if (!confirm('¿Cambiar el nombre a "' + newName + '"?')) {
+        return;
+    }
+
+    try {
+        response = await fetch("/genres/" + id, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: newName })
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al actualizar");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("No se pudo actualizar el género.");
+    }
+}
+
+async function handleGenreDelete(event) {
+    var cell;
+    var id;
+    var response;
+
+    cell = event.target.closest("td");
+    id = cell.getAttribute("data-id");
+
+    if (!confirm("¿Borrar este género? Solo se puede si no tiene juegos asociados.")) {
+        return;
+    }
+
+    try {
+        response = await fetch("/genres/" + id, { method: "DELETE" });
+
+        if (!response.ok) {
+            throw new Error("Error al borrar");
+        }
+
+        renderGenresTable();
+
+    } catch (err) {
+        console.error(err);
+        alert("No se pudo borrar (puede que tenga juegos asociados).");
+    }
+}
+
 document.getElementById("export-csv-btn").addEventListener("click", function () {
     window.location.href = "/export/csv";
 });
@@ -344,3 +512,5 @@ loadHeader();
 renderAddGameForm();
 renderAddPlatformForm();
 renderPlatformsTable();
+renderAddGenreForm();
+renderGenresTable();

@@ -50,8 +50,6 @@ func main() {
 	router.GET("/platforms/:id", handlers.GetPlatformHandler(pool))
 	router.GET("/platforms", handlers.GetAllPlatformsHandler(pool))
 
-	router.GET("/genres", handlers.GetAllGenresHandler(pool))
-
 	router.GET("/games", handlers.GetAllGamesHandler(pool))
 	router.GET("/games/status/:status", handlers.GetGamesByStatusHandler(pool))
 	router.GET("/games/title/:title", handlers.GetGamesByTitleHandler(pool))
@@ -62,6 +60,12 @@ func main() {
 	router.GET("/stats/rating-distribution", handlers.GetRatingDistributionHandler(pool))
 	router.GET("/stats/top-platforms", handlers.GetTopPlatformsHandler(pool))
 	router.GET("/stats/top-genres", handlers.GetTopGenresHandler(pool))
+
+	router.GET("/genres", handlers.GetAllGenresHandler(pool))
+	router.POST("/genres", handlers.CreateGenreHandler(pool))
+	router.GET("/genres/:id", handlers.GetGenreHandler(pool))
+	router.PUT("/genres/:id", handlers.UpdateGenreHandler(pool))
+	router.DELETE("/genres/:id", handlers.DeleteGenreHandler(pool))
 
 	router.POST("/games", handlers.CreateGameHandler(pool))
 	router.DELETE("/games/:id", handlers.DeleteGameHandler(pool))
