@@ -76,6 +76,9 @@ async function renderAddGameForm() {
 
     platformOptions = "";
     if (platformsList) {
+        platformsList.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
         for (i = 0; i < platformsList.length; i++) {
             platformOptions += '<option value="' + platformsList[i].id + '">' + platformsList[i].name + '</option>';
         }
@@ -83,6 +86,9 @@ async function renderAddGameForm() {
 
     genreOptions = "";
     if (genresList) {
+        genresList.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
         for (i = 0; i < genresList.length; i++) {
             genreOptions += '<option value="' + genresList[i].id + '">' + genresList[i].name + '</option>';
         }

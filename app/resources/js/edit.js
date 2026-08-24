@@ -9,8 +9,9 @@ async function openEditModal(gameId) {
     var gid;
     var opt;
     var gopt;
-
-
+    var i;
+    var platformEntries;
+    var genreEntries;
 
     await loadMaps();
 
@@ -28,24 +29,34 @@ async function openEditModal(gameId) {
     document.getElementById("edit-form-message").textContent = "";
     document.getElementById("edit-review-input").value = game.review || "";
 
+    platformEntries = Object.entries(platformMap).sort(function (a, b) {
+        return a[1].localeCompare(b[1]);
+    });
+
     platformsSelect = document.getElementById("edit-platforms-input");
     platformsSelect.innerHTML = "";
-    for (id in platformMap) {
+    for (i = 0; i < platformEntries.length; i++) {
+        id = platformEntries[i][0];
         opt = document.createElement("option");
         opt.value = id;
-        opt.textContent = platformMap[id];
+        opt.textContent = platformEntries[i][1];
         if (game.platform_ids && game.platform_ids.indexOf(parseInt(id, 10)) !== -1) {
             opt.selected = true;
         }
         platformsSelect.appendChild(opt);
     }
 
+    genreEntries = Object.entries(genreMap).sort(function (a, b) {
+        return a[1].localeCompare(b[1]);
+    });
+
     genresSelect = document.getElementById("edit-genres-input");
     genresSelect.innerHTML = "";
-    for (gid in genreMap) {
+    for (i = 0; i < genreEntries.length; i++) {
+        gid = genreEntries[i][0];
         gopt = document.createElement("option");
         gopt.value = gid;
-        gopt.textContent = genreMap[gid];
+        gopt.textContent = genreEntries[i][1];
         if (game.genre_ids && game.genre_ids.indexOf(parseInt(gid, 10)) !== -1) {
             gopt.selected = true;
         }

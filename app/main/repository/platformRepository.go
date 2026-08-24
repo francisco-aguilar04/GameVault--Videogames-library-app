@@ -44,7 +44,7 @@ func GetAllPlatforms(pool *pgxpool.Pool) ([]models.Platform, error) {
 	var err error
 	var rows pgx.Rows
 
-	sql := "SELECT id, name FROM platforms"
+	sql := "SELECT id, name FROM platforms ORDER BY name"
 
 	rows, err = pool.Query(context.Background(), sql)
 	if err != nil {
