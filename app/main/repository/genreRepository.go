@@ -41,7 +41,7 @@ func GetAllGenres(pool *pgxpool.Pool) ([]models.Genre, error) {
 	var err error
 	var rows pgx.Rows
 
-	sql := "SELECT id, name FROM genres"
+	sql := "SELECT id, name FROM genres ORDER BY name"
 
 	rows, err = pool.Query(context.Background(), sql)
 
