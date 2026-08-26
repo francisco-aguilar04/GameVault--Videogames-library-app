@@ -510,6 +510,155 @@ async function handleGenreDelete(event) {
     }
 }
 
+async function renderAddWishlistForm() {
+    var container = document.getElementById("add-wishlist-form");
+    var platformsResponse;
+    var genresResponse;
+    var platformsList;
+    var genresList;
+    var platformOptions;
+    var genreOptions;
+    var currentYear;
+    var i;
+
+    platformsResponse = await fetch("/platforms");
+    platformsList = await platformsResponse.json();
+
+    genresResponse = await fetch("/genres");
+    genresList = await genresResponse.json();
+
+    currentYear = new Date().getFullYear();
+
+    platformOptions = "";
+    if (platformsList) {
+        platformsList.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
+        for (i = 0; i < platformsList.length; i++) {
+            platformOptions += '<option value="' + platformsList[i].id + '">' + platformsList[i].name + '</option>';
+        }
+    }
+
+    genreOptions = "";
+    if (genresList) {
+        genresList.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
+        for (i = 0; i < genresList.length; i++) {
+            genreOptions += '<option value="' + genresList[i].id + '">' + genresList[i].name + '</option>';
+        }
+    }
+
+    container.innerHTML = `
+		<form id="wishlist-form">
+			<div class="row mb-2">
+				<div class="col-6">
+					<label class="form-label small">Título</label>
+					<input type="text" id="wishlist-title-input" class="form-control" required maxlength="255">
+				</div>
+				<div class="col-3">
+					<label class="form-label small">Año</label>
+					<input type="number" id="wishlist-year-input" class="form-control" min="1950" max="${currentYear}">
+				</div>
+				<div class="col-3">
+					<label class="form-label small">URL de la foto</label>
+					<input type="url" id="wishlist-photo-input" class="form-control">
+				</div>
+			</div>
+			<div class="row mb-2">
+				<div class="col-6">
+					<label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
+					<select id="wishlist-platforms-input" class="form-select" multiple size="4">${platformOptions}</select>
+				</div>
+				<div class="col-6">
+					<label class="form-label small">Géneros <span>(Ctrl/Cmd)</span></label>
+					<select id="wishlist-genres-input" class="form-select" multiple size="4">${genreOptions}</select>
+				</div>
+			</div>
+			<div class="mb-3">
+				<label class="form-label small">Notas</label>
+				<textarea id="wishlist-notes-input" class="form-control" rows="2"></textarea>
+			</div>
+			<button type="submit" class="btn btn-outline-primary">Añadir a wishlist</button>
+		</form>
+		<p id="wishlist-form-message" class="mt-2 mb-0 small"></p>
+	`;
+
+    document.getElementById("wishlist-form").addEventListener("submit", handleAddWishlistItem);
+}
+
+async function handleAddWishlistItem(event) {
+    var titleInput;
+    var yearInput;
+    var photoInput;
+    var notesInput;
+    var platformsSelect;
+    var genresSelect;
+    var messageEl;
+    var platformIds;
+    var genreIds;
+    var payload;
+    var response;
+    var i;
+
+    event.preventDefault();
+
+    titleInput = document.getElementById("wishlist-title-input");
+    yearInput = document.getElementById("wishlist-year-input");
+    photoInput = document.getElementById("wishlist-photo-input");
+    notesInput = document.getElementById("wishlist-notes-input");
+    platformsSelect = document.getElementById("wishlist-platforms-input");
+    genresSelect = document.getElementById("wishlist-genres-input");
+    messageEl = document.getElementById("wishlist-form-message");
+
+    platformIds = [];
+    for (i = 0; i < platformsSelect.selectedOptions.length; i++) {
+        platformIds.push(parseInt(platformsSelect.selectedOptions[i].value, 10));
+    }
+
+    genreIds = [];
+    for (i = 0; i < genresSelect.selectedOptions.length; i++) {
+        genreIds.push(parseInt(genresSelect.selectedOptions[i].value, 10));
+    }
+
+    payload = {
+        title: titleInput.value.trim(),
+        platform_ids: platformIds,
+        genre_ids: genreIds
+    };
+
+    if (yearInput.value) {
+        payload.release_year = parseInt(yearInput.value, 10);
+    }
+    if (photoInput.value.trim()) {
+        payload.photo_url = photoInput.value.trim();
+    }
+    if (notesInput.value.trim()) {
+        payload.notes = notesInput.value.trim();
+    }
+
+    try {
+        response = await fetch("/wishlist", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al añadir");
+        }
+
+        messageEl.className = "mt-2 mb-0 small text-success";
+        messageEl.textContent = "Añadido a la wishlist.";
+        document.getElementById("wishlist-form").reset();
+
+    } catch (err) {
+        console.error(err);
+        messageEl.className = "mt-2 mb-0 small text-danger";
+        messageEl.textContent = "No se pudo añadir.";
+    }
+}
+
 document.getElementById("export-csv-btn").addEventListener("click", function () {
     window.location.href = "/export/csv";
 });
@@ -520,3 +669,4 @@ renderAddPlatformForm();
 renderPlatformsTable();
 renderAddGenreForm();
 renderGenresTable();
+renderAddWishlistForm();

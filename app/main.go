@@ -71,6 +71,13 @@ func main() {
 	router.DELETE("/games/:id", handlers.DeleteGameHandler(pool))
 	router.PUT("/games/:id", handlers.UpdateGameHandler(pool))
 
+	router.POST("/wishlist", handlers.CreateWishlistItemHandler(pool))
+	router.GET("/wishlist", handlers.GetAllWishlistItemsHandler(pool))
+	router.GET("/wishlist/:id", handlers.GetWishlistItemHandler(pool))
+	router.PUT("/wishlist/:id", handlers.UpdateWishlistItemHandler(pool))
+	router.DELETE("/wishlist/:id", handlers.DeleteWishlistItemHandler(pool))
+	router.POST("/wishlist/:id/move-to-library", handlers.MoveToLibraryHandler(pool))
+
 	router.GET("/export/csv", handlers.ExportCSVHandler(pool))
 
 	// Health check endpoint: reports whether the database connection is alive
