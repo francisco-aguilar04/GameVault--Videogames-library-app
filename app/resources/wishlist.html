@@ -17,94 +17,104 @@
 
     <div id="header-placeholder"></div>
 
-    <main class="container-fluid py-4">
+    <main class="container-fluid pb-4 pt-3 px-4">
         <h2 class="h4 fw-bold mb-4">Lista de deseados</h2>
 
         <div id="wishlist-grid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 gy-4 gx-3">
             <p class="text-secondary">Cargando...</p>
         </div>
-    </main>
 
-    <template id="wishlist-card-template">
 
-        <div class="col">
+        <template id="wishlist-card-template">
 
-            <div class="card bg-secondary shadow bg-opacity-25 border-secondary rounded-4 h-100 wishlist-card">
+            <div class="col">
 
-                <div class="position-relative overflow-hidden">
-                    <img class="card-img-top img-fluid wishlist-cover game-cover">
-                </div>
+                <div class="card bg-secondary shadow bg-opacity-25 border-secondary rounded-4 h-100 wishlist-card">
 
-                <div class="card-body p-2 d-flex flex-column">
-
-                    <p class="card-title fw-bold text-light text-center fs-5 mb-1 wishlist-title game-title"></p>
-
-                    <div class="d-flex align-items-center gap-2 mb-1 mt-auto wishlist-meta-row">
-                        <span class="text-light text-opacity-50 small wishlist-year"></span>
-                        <span class="text-light text-opacity-50 small wishlist-separator">•</span>
-                        <div class="text-light text-opacity-50 small d-flex gap-1 wishlist-genres"></div>
+                    <div class="position-relative overflow-hidden">
+                        <img class="card-img-top img-fluid wishlist-cover game-cover">
                     </div>
 
-                    <div class="wishlist-pills d-flex flex-wrap mb-2 mt-1"></div>
+                    <div class="card-body p-2 d-flex flex-column">
 
-                </div>
+                        <p class="card-title fw-bold text-light text-center fs-5 mb-1 wishlist-title game-title"></p>
 
-            </div>
-        </div>
-    </template>
+                        <div class="d-flex align-items-center gap-2 mb-1 mt-auto wishlist-meta-row">
+                            <span class="text-light text-opacity-50 small wishlist-year"></span>
+                            <span class="text-light text-opacity-50 small wishlist-separator">•</span>
+                            <div class="text-light text-opacity-50 small d-flex gap-1 wishlist-genres"></div>
+                        </div>
 
-    <div class="modal fade" id="wishlist-modal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content bg-dark text-light">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title">Editar deseado</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="wishlist-edit-form">
-                        <input type="hidden" id="wishlist-edit-id">
-                        <div class="mb-2">
-                            <label class="form-label small">Título</label>
-                            <input type="text" id="wishlist-edit-title" class="form-control" required maxlength="255">
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-6">
-                                <label class="form-label small">Año</label>
-                                <input type="number" id="wishlist-edit-year" class="form-control" min="1950">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label small">URL de la foto</label>
-                                <input type="url" id="wishlist-edit-photo" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-6">
-                                <label class="form-label small">Plataformas</label>
-                                <select id="wishlist-edit-platforms" class="form-select" multiple size="4"></select>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label small">Géneros</label>
-                                <select id="wishlist-edit-genres" class="form-select" multiple size="4"></select>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small">Notas</label>
-                            <textarea id="wishlist-edit-notes" class="form-control" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-secondary">
-                    <button type="button" class="btn btn-outline-success me-auto" id="wishlist-move-btn">
-                        <i class="bi bi-arrow-right-circle"></i> Mover a biblioteca
-                    </button>
-                    <button type="button" class="btn btn-outline-danger" id="wishlist-delete-btn">
-                        <i class="bi bi-trash"></i> Borrar
-                    </button>
-                    <button type="button" class="btn btn-outline-primary" id="wishlist-save-btn">Guardar</button>
+                        <div class="wishlist-pills d-flex flex-wrap mb-2 mt-1"></div>
+
+                    </div>
+
                 </div>
             </div>
+        </template>
+
+        <div class="modal fade" id="wishlist-modal" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+
+                <div class="modal-content bg-dark text-light">
+
+                    <div class="position-relative edit-hero">
+                        <img id="wishlist-edit-hero-img" class="w-100 object-fit-cover" style="height: 200px;"
+                            alt="Portada">
+                        <div class="edit-hero-overlay"></div>
+                    </div>
+
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">Editar deseado</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="wishlist-edit-form">
+                            <input type="hidden" id="wishlist-edit-id">
+                            <div class="mb-2">
+                                <label class="form-label small">Título</label>
+                                <input type="text" id="wishlist-edit-title" class="form-control" required
+                                    maxlength="255">
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small">Año</label>
+                                    <input type="number" id="wishlist-edit-year" class="form-control" min="1950">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small">URL de la foto</label>
+                                    <input type="url" id="wishlist-edit-photo" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small">Plataformas</label>
+                                    <select id="wishlist-edit-platforms" class="form-select" multiple size="4"></select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small">Géneros</label>
+                                    <select id="wishlist-edit-genres" class="form-select" multiple size="4"></select>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">Notas</label>
+                                <textarea id="wishlist-edit-notes" class="form-control" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-outline-success me-auto" id="wishlist-move-btn">
+                            <i class="bi bi-arrow-right-circle"></i> Mover a biblioteca
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="wishlist-delete-btn">
+                            <i class="bi bi-trash"></i> Borrar
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="wishlist-save-btn">Guardar</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
     </main>
 

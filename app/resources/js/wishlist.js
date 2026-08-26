@@ -90,6 +90,7 @@ async function openWishlistModal(id) {
     document.getElementById("wishlist-edit-year").value = item.release_year || "";
     document.getElementById("wishlist-edit-photo").value = item.photo_url || "";
     document.getElementById("wishlist-edit-notes").value = item.notes || "";
+    document.getElementById("wishlist-edit-hero-img").src = item.photo_url || "https://placehold.co/600x200?text=Sin+portada";
 
     platformEntries = Object.entries(platformMap).sort(function (a, b) {
         return a[1].localeCompare(b[1]);
