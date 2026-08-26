@@ -26,20 +26,29 @@
     </main>
 
     <template id="wishlist-card-template">
+
         <div class="col">
+
             <div class="card bg-secondary shadow bg-opacity-25 border-secondary rounded-4 h-100 wishlist-card">
+
                 <div class="position-relative overflow-hidden">
-                    <img class="card-img-top img-fluid wishlist-cover">
+                    <img class="card-img-top img-fluid wishlist-cover game-cover">
                 </div>
+
                 <div class="card-body p-2 d-flex flex-column">
-                    <p class="card-title fw-bold text-light text-center fs-5 mb-1 wishlist-title"></p>
+
+                    <p class="card-title fw-bold text-light text-center fs-5 mb-1 wishlist-title game-title"></p>
+
                     <div class="d-flex align-items-center gap-2 mb-1 mt-auto wishlist-meta-row">
                         <span class="text-light text-opacity-50 small wishlist-year"></span>
                         <span class="text-light text-opacity-50 small wishlist-separator">•</span>
                         <div class="text-light text-opacity-50 small d-flex gap-1 wishlist-genres"></div>
                     </div>
-                    <div class="wishlist-pills mb-2 mt-1"></div>
+
+                    <div class="wishlist-pills d-flex flex-wrap mb-2 mt-1"></div>
+
                 </div>
+
             </div>
         </div>
     </template>
