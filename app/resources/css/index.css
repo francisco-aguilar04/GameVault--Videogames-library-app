@@ -84,3 +84,11 @@ header {
     inset: 0;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 60%);
 }
+
+.checklist-box {
+    max-height: 140px;
+    overflow-y: auto;
+    border: 1px solid var(--bs-secondary);
+    border-radius: 8px;
+    padding: 8px 10px;
+}

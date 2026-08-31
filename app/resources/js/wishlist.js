@@ -70,15 +70,8 @@ function buildWishlistCard(item) {
 async function openWishlistModal(id) {
     var response;
     var item;
-    var platformEntries;
-    var genreEntries;
-    var platformsSelect;
-    var genresSelect;
-    var i;
-    var pid;
-    var gid;
-    var opt;
-    var gopt;
+    var platformItems;
+    var genreItems;
 
     await loadMaps();
 
@@ -92,39 +85,19 @@ async function openWishlistModal(id) {
     document.getElementById("wishlist-edit-notes").value = item.notes || "";
     document.getElementById("wishlist-edit-hero-img").src = item.photo_url || "https://placehold.co/600x200?text=Sin+portada";
 
-    platformEntries = Object.entries(platformMap).sort(function (a, b) {
-        return a[1].localeCompare(b[1]);
-    });
+    platformItems = Object.entries(platformMap).map(function (entry) {
+        return { id: parseInt(entry[0], 10), name: entry[1] };
+    }).sort(function (a, b) { return a.name.localeCompare(b.name); });
 
-    platformsSelect = document.getElementById("wishlist-edit-platforms");
-    platformsSelect.innerHTML = "";
-    for (i = 0; i < platformEntries.length; i++) {
-        pid = platformEntries[i][0];
-        opt = document.createElement("option");
-        opt.value = pid;
-        opt.textContent = platformEntries[i][1];
-        if (item.platform_ids && item.platform_ids.indexOf(parseInt(pid, 10)) !== -1) {
-            opt.selected = true;
-        }
-        platformsSelect.appendChild(opt);
-    }
+    document.getElementById("wishlist-edit-platforms").innerHTML =
+        buildCheckboxListHTML("wishlist-edit-platform", platformItems, item.platform_ids || []);
 
-    genreEntries = Object.entries(genreMap).sort(function (a, b) {
-        return a[1].localeCompare(b[1]);
-    });
+    genreItems = Object.entries(genreMap).map(function (entry) {
+        return { id: parseInt(entry[0], 10), name: entry[1] };
+    }).sort(function (a, b) { return a.name.localeCompare(b.name); });
 
-    genresSelect = document.getElementById("wishlist-edit-genres");
-    genresSelect.innerHTML = "";
-    for (i = 0; i < genreEntries.length; i++) {
-        gid = genreEntries[i][0];
-        gopt = document.createElement("option");
-        gopt.value = gid;
-        gopt.textContent = genreEntries[i][1];
-        if (item.genre_ids && item.genre_ids.indexOf(parseInt(gid, 10)) !== -1) {
-            gopt.selected = true;
-        }
-        genresSelect.appendChild(gopt);
-    }
+    document.getElementById("wishlist-edit-genres").innerHTML =
+        buildCheckboxListHTML("wishlist-edit-genre", genreItems, item.genre_ids || []);
 
     if (!wishlistModal) {
         wishlistModal = new bootstrap.Modal(document.getElementById("wishlist-modal"));
@@ -134,27 +107,15 @@ async function openWishlistModal(id) {
 
 async function handleWishlistSave() {
     var id;
-    var platformsSelect;
-    var genresSelect;
     var platformIds;
     var genreIds;
-    var i;
     var payload;
     var response;
 
     id = document.getElementById("wishlist-edit-id").value;
 
-    platformsSelect = document.getElementById("wishlist-edit-platforms");
-    platformIds = [];
-    for (i = 0; i < platformsSelect.selectedOptions.length; i++) {
-        platformIds.push(parseInt(platformsSelect.selectedOptions[i].value, 10));
-    }
-
-    genresSelect = document.getElementById("wishlist-edit-genres");
-    genreIds = [];
-    for (i = 0; i < genresSelect.selectedOptions.length; i++) {
-        genreIds.push(parseInt(genresSelect.selectedOptions[i].value, 10));
-    }
+    platformIds = getCheckedIds("wishlist-edit-platform");
+    genreIds = getCheckedIds("wishlist-edit-genre");
 
     payload = {
         title: document.getElementById("wishlist-edit-title").value.trim(),

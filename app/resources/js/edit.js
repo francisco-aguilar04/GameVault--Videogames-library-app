@@ -3,15 +3,8 @@ var editModal;
 async function openEditModal(gameId) {
     var gameResponse;
     var game;
-    var platformsSelect;
-    var genresSelect;
-    var id;
-    var gid;
-    var opt;
-    var gopt;
-    var i;
-    var platformEntries;
-    var genreEntries;
+    var platformItems;
+    var genreItems;
 
     await loadMaps();
 
@@ -29,39 +22,19 @@ async function openEditModal(gameId) {
     document.getElementById("edit-form-message").textContent = "";
     document.getElementById("edit-review-input").value = game.review || "";
 
-    platformEntries = Object.entries(platformMap).sort(function (a, b) {
-        return a[1].localeCompare(b[1]);
-    });
+    platformItems = Object.entries(platformMap).map(function (entry) {
+        return { id: parseInt(entry[0], 10), name: entry[1] };
+    }).sort(function (a, b) { return a.name.localeCompare(b.name); });
 
-    platformsSelect = document.getElementById("edit-platforms-input");
-    platformsSelect.innerHTML = "";
-    for (i = 0; i < platformEntries.length; i++) {
-        id = platformEntries[i][0];
-        opt = document.createElement("option");
-        opt.value = id;
-        opt.textContent = platformEntries[i][1];
-        if (game.platform_ids && game.platform_ids.indexOf(parseInt(id, 10)) !== -1) {
-            opt.selected = true;
-        }
-        platformsSelect.appendChild(opt);
-    }
+    document.getElementById("edit-platforms-input").innerHTML =
+        buildCheckboxListHTML("edit-game-platform", platformItems, game.platform_ids || []);
 
-    genreEntries = Object.entries(genreMap).sort(function (a, b) {
-        return a[1].localeCompare(b[1]);
-    });
+    genreItems = Object.entries(genreMap).map(function (entry) {
+        return { id: parseInt(entry[0], 10), name: entry[1] };
+    }).sort(function (a, b) { return a.name.localeCompare(b.name); });
 
-    genresSelect = document.getElementById("edit-genres-input");
-    genresSelect.innerHTML = "";
-    for (i = 0; i < genreEntries.length; i++) {
-        gid = genreEntries[i][0];
-        gopt = document.createElement("option");
-        gopt.value = gid;
-        gopt.textContent = genreEntries[i][1];
-        if (game.genre_ids && game.genre_ids.indexOf(parseInt(gid, 10)) !== -1) {
-            gopt.selected = true;
-        }
-        genresSelect.appendChild(gopt);
-    }
+    document.getElementById("edit-genres-input").innerHTML =
+        buildCheckboxListHTML("edit-game-genre", genreItems, game.genre_ids || []);
 
     if (!editModal) {
         editModal = new bootstrap.Modal(document.getElementById("edit-game-modal"));
@@ -71,11 +44,8 @@ async function openEditModal(gameId) {
 
 async function handleSaveEdit() {
     var id;
-    var platformsSelect;
-    var genresSelect;
     var platformIds;
     var genreIds;
-    var i;
     var payload;
     var response;
     var messageEl;
@@ -83,23 +53,15 @@ async function handleSaveEdit() {
     id = document.getElementById("edit-game-id").value;
     messageEl = document.getElementById("edit-form-message");
 
-    platformsSelect = document.getElementById("edit-platforms-input");
-    platformIds = [];
-    for (i = 0; i < platformsSelect.selectedOptions.length; i++) {
-        platformIds.push(parseInt(platformsSelect.selectedOptions[i].value, 10));
-    }
-
-    genresSelect = document.getElementById("edit-genres-input");
-    genreIds = [];
-    for (i = 0; i < genresSelect.selectedOptions.length; i++) {
-        genreIds.push(parseInt(genresSelect.selectedOptions[i].value, 10));
-    }
+    platformIds = getCheckedIds("edit-game-platform");
+    genreIds = getCheckedIds("edit-game-genre");
 
     payload = {
         title: document.getElementById("edit-title-input").value.trim(),
         status: document.getElementById("edit-status-input").value,
         platform_ids: platformIds,
-        genre_ids: genreIds
+        genre_ids: genreIds,
+        review: document.getElementById("edit-review-input").value.trim()
     };
 
     if (document.getElementById("edit-year-input").value) {
@@ -168,7 +130,6 @@ function populateHero(game) {
     var heroPlatforms;
     var genreNames;
     var metaText;
-    var i;
 
     heroImg = document.getElementById("edit-hero-img");
     heroImg.src = game.photo_url || "https://placehold.co/800x400?text=Sin+portada";

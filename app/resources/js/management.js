@@ -74,25 +74,8 @@ async function renderAddGameForm() {
 
     currentYear = new Date().getFullYear();
 
-    platformOptions = "";
-    if (platformsList) {
-        platformsList.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-        for (i = 0; i < platformsList.length; i++) {
-            platformOptions += '<option value="' + platformsList[i].id + '">' + platformsList[i].name + '</option>';
-        }
-    }
-
-    genreOptions = "";
-    if (genresList) {
-        genresList.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-        for (i = 0; i < genresList.length; i++) {
-            genreOptions += '<option value="' + genresList[i].id + '">' + genresList[i].name + '</option>';
-        }
-    }
+    platformOptions = platformsList ? buildCheckboxListHTML("game-platform", platformsList, []) : "";
+    genreOptions = genresList ? buildCheckboxListHTML("game-genre", genresList, []) : "";
 
     container.innerHTML = `
         <form id="game-form">
@@ -132,7 +115,7 @@ async function renderAddGameForm() {
 
                     <div class="col-4">
                         <label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
-                        <select id="game-platforms-input" class="form-select" multiple size="4">${platformOptions}</select>
+                        ${platformOptions}
                     </div>
 
                     <div class="col-4">
@@ -173,19 +156,10 @@ async function handleAddGame(event) {
     yearInput = document.getElementById("game-year-input");
     ratingInput = document.getElementById("game-rating-input");
     photoInput = document.getElementById("game-photo-input");
-    platformsSelect = document.getElementById("game-platforms-input");
-    genresSelect = document.getElementById("game-genres-input");
     messageEl = document.getElementById("game-form-message");
 
-    platformIds = [];
-    for (i = 0; i < platformsSelect.selectedOptions.length; i++) {
-        platformIds.push(parseInt(platformsSelect.selectedOptions[i].value, 10));
-    }
-
-    genreIds = [];
-    for (i = 0; i < genresSelect.selectedOptions.length; i++) {
-        genreIds.push(parseInt(genresSelect.selectedOptions[i].value, 10));
-    }
+    platformIds = getCheckedIds("game-platform");
+    genreIds = getCheckedIds("game-genre");
 
     payload = {
         title: titleInput.value.trim(),
@@ -529,25 +503,8 @@ async function renderAddWishlistForm() {
 
     currentYear = new Date().getFullYear();
 
-    platformOptions = "";
-    if (platformsList) {
-        platformsList.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-        for (i = 0; i < platformsList.length; i++) {
-            platformOptions += '<option value="' + platformsList[i].id + '">' + platformsList[i].name + '</option>';
-        }
-    }
-
-    genreOptions = "";
-    if (genresList) {
-        genresList.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-        for (i = 0; i < genresList.length; i++) {
-            genreOptions += '<option value="' + genresList[i].id + '">' + genresList[i].name + '</option>';
-        }
-    }
+    platformOptions = platformsList ? buildCheckboxListHTML("wishlist-platform", platformsList, []) : "";
+    genreOptions = genresList ? buildCheckboxListHTML("wishlist-genre", genresList, []) : "";
 
     container.innerHTML = `
 		<form id="wishlist-form">
@@ -568,7 +525,7 @@ async function renderAddWishlistForm() {
 			<div class="row mb-2">
 				<div class="col-6">
 					<label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
-					<select id="wishlist-platforms-input" class="form-select" multiple size="4">${platformOptions}</select>
+					${platformOptions}
 				</div>
 				<div class="col-6">
 					<label class="form-label small">Géneros <span>(Ctrl/Cmd)</span></label>
@@ -611,15 +568,8 @@ async function handleAddWishlistItem(event) {
     genresSelect = document.getElementById("wishlist-genres-input");
     messageEl = document.getElementById("wishlist-form-message");
 
-    platformIds = [];
-    for (i = 0; i < platformsSelect.selectedOptions.length; i++) {
-        platformIds.push(parseInt(platformsSelect.selectedOptions[i].value, 10));
-    }
-
-    genreIds = [];
-    for (i = 0; i < genresSelect.selectedOptions.length; i++) {
-        genreIds.push(parseInt(genresSelect.selectedOptions[i].value, 10));
-    }
+    platformIds = getCheckedIds("wishlist-platform");
+    genreIds = getCheckedIds("wishlist-genre");
 
     payload = {
         title: titleInput.value.trim(),

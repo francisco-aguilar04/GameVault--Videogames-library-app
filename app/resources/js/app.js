@@ -201,7 +201,7 @@ function toggleRatingSort() {
 
 	var buttonEl = document.getElementById("rating-sort-toggle");
 	var iconEl = buttonEl.querySelector("i");
-	iconEl.className = ratingSortAscending ? "bi bi-arrow-down" : "bi bi-arrow-up";
+	iconEl.className = ratingSortAscending ? "bi bi-arrow-up" : "bi bi-arrow-down";
 
 	renderGames(sortGamesByRating(currentGames), platformMap, genreMap);
 }
@@ -451,6 +451,33 @@ function platformBadgeClass(name) {
 	}
 
 	return "bg-dark";
+}
+
+function buildCheckboxListHTML(namePrefix, items, selectedIds) {
+	var html = '<div class="checklist-box">';
+	var selected = selectedIds || [];
+	var i;
+
+	for (i = 0; i < items.length; i++) {
+		var checked = selected.indexOf(items[i].id) !== -1 ? "checked" : "";
+		html +=
+			'<div class="form-check">' +
+			'<input class="form-check-input" type="checkbox" value="' + items[i].id + '" ' +
+			'id="' + namePrefix + '-' + items[i].id + '" name="' + namePrefix + '" ' + checked + '>' +
+			'<label class="form-check-label" for="' + namePrefix + '-' + items[i].id + '">' + items[i].name + '</label>' +
+			'</div>';
+	}
+
+	html += '</div>';
+	return html;
+}
+
+function getCheckedIds(namePrefix) {
+	var ids = [];
+	document.querySelectorAll('input[name="' + namePrefix + '"]:checked').forEach(function (cb) {
+		ids.push(parseInt(cb.value, 10));
+	});
+	return ids;
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
