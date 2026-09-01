@@ -113,14 +113,14 @@ async function renderAddGameForm() {
             
                 <div class="row my-3">
 
-                    <div class="col-4">
+                    <div class="col-4 text-light">
                         <label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
                         ${platformOptions}
                     </div>
 
-                    <div class="col-4">
+                    <div class="col-4 text-light">
                         <label class="form-label small">Géneros <span>(Ctrl/Cmd)</span></label>
-                        <select id="game-genres-input" class="form-select" multiple size="4">${genreOptions}</select>
+                        ${genreOptions}
                     </div>
 
                 </div>
@@ -139,8 +139,6 @@ async function handleAddGame(event) {
     var yearInput;
     var ratingInput;
     var photoInput;
-    var platformsSelect;
-    var genresSelect;
     var messageEl;
     var response;
     var result;
@@ -523,13 +521,13 @@ async function renderAddWishlistForm() {
 				</div>
 			</div>
 			<div class="row mb-2">
-				<div class="col-6">
+				<div class="col-6 text-light">
 					<label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
 					${platformOptions}
 				</div>
-				<div class="col-6">
+				<div class="col-6 text-light">
 					<label class="form-label small">Géneros <span>(Ctrl/Cmd)</span></label>
-					<select id="wishlist-genres-input" class="form-select" multiple size="4">${genreOptions}</select>
+					${genreOptions}
 				</div>
 			</div>
 			<div class="mb-3">
@@ -549,14 +547,11 @@ async function handleAddWishlistItem(event) {
     var yearInput;
     var photoInput;
     var notesInput;
-    var platformsSelect;
-    var genresSelect;
     var messageEl;
     var platformIds;
     var genreIds;
     var payload;
     var response;
-    var i;
 
     event.preventDefault();
 
