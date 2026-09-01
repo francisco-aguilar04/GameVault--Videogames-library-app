@@ -139,3 +139,77 @@ func MoveToLibraryHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 		c.JSON(http.StatusCreated, game)
 	}
 }
+
+func GetWishlistItemsByTitleHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var title string
+		var items []models.WishlistItem
+		var err error
+
+		title = c.Param("title")
+
+		items, err = repository.GetWishlistItemsByTitle(pool, title)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		if items == nil {
+			items = []models.WishlistItem{}
+		}
+
+		c.JSON(http.StatusOK, items)
+	}
+}
+
+func GetWishlistItemsByPlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var platformID int
+		var err error
+
+		platformID, err = strconv.Atoi(c.Param("platformId"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "id inválido"})
+			return
+		}
+
+		var items []models.WishlistItem
+		items, err = repository.GetWishlistItemsByPlatform(pool, platformID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		if items == nil {
+			items = []models.WishlistItem{}
+		}
+
+		c.JSON(http.StatusOK, items)
+	}
+}
+
+func GetWishlistItemsByGenreHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var genreID int
+		var err error
+
+		genreID, err = strconv.Atoi(c.Param("genreId"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "id inválido"})
+			return
+		}
+
+		var items []models.WishlistItem
+		items, err = repository.GetWishlistItemsByGenre(pool, genreID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		if items == nil {
+			items = []models.WishlistItem{}
+		}
+
+		c.JSON(http.StatusOK, items)
+	}
+}
