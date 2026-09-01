@@ -20,10 +20,34 @@
     <main class="container-fluid pb-4 pt-3 px-4">
         <h2 class="h4 fw-bold mb-4">Lista de deseados</h2>
 
+        <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+
+            <div class="input-group" style="max-width: 300px;">
+                <button class="btn btn-primary" type="button" onclick="handleWishlistSearch()">
+                    <i class="bi bi-search"></i>
+                </button>
+                <input type="text" id="wishlist-search" class="form-control" maxlength="41" placeholder="Buscar...">
+            </div>
+
+            <select id="wishlist-platform-filter" class="form-select w-auto"
+                onchange="filterWishlistByPlatform(this.value)">
+                <option value="">Todas las plataformas</option>
+            </select>
+
+            <select id="wishlist-genre-filter" class="form-select w-auto" onchange="filterWishlistByGenre(this.value)">
+                <option value="">Todos los géneros</option>
+            </select>
+
+            <button class="btn btn-primary btn-sm" type="button" id="wishlist-sort-toggle"
+                onclick="toggleWishlistSort()">
+                A-Z<i class="bi bi-arrow-down"></i>
+            </button>
+
+        </div>
+
         <div id="wishlist-grid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 gy-4 gx-3">
             <p class="text-secondary">Cargando...</p>
         </div>
-
 
         <template id="wishlist-card-template">
 

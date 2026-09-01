@@ -5,11 +5,13 @@ async function loadWishlist() {
     var items;
 
     await loadMaps();
+    await populateWishlistFilters();
 
     response = await fetch("/wishlist");
     items = await response.json();
 
-    renderWishlistGrid(items);
+    currentWishlistItems = items;
+    renderWishlistGrid(sortWishlist(currentWishlistItems));
 }
 
 function renderWishlistGrid(items) {
@@ -201,6 +203,114 @@ async function handleMoveToLibrary() {
         console.error(err);
         alert("No se pudo mover a la biblioteca.");
     }
+}
+
+async function filterWishlistByTitle(title) {
+    var endpoint;
+    var response;
+    var items;
+
+    await loadMaps();
+
+    endpoint = title ? "/wishlist/title/" + encodeURIComponent(title) : "/wishlist";
+
+    try {
+        response = await fetch(endpoint);
+
+        if (!response.ok) {
+            throw new Error("Error en la respuesta del servidor");
+        }
+
+        items = await response.json();
+
+        currentWishlistItems = items;
+        renderWishlistGrid(sortWishlist(currentWishlistItems));
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("wishlist-grid").innerHTML = '<p class="text-danger">Error al buscar.</p>';
+    }
+}
+
+function handleWishlistSearch() {
+    var inputEl = document.getElementById("wishlist-search");
+    var title = inputEl.value.trim();
+
+    filterWishlistByTitle(title);
+}
+
+document.getElementById("wishlist-search").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        handleWishlistSearch();
+    }
+});
+
+var wishlistSortAscending = true;
+var currentWishlistItems = [];
+
+async function populateWishlistFilters() {
+    await loadMaps();
+
+    var platformSelect = document.getElementById("wishlist-platform-filter");
+    var platformEntries = Object.entries(platformMap).sort(function (a, b) {
+        return a[1].localeCompare(b[1]);
+    });
+    platformEntries.forEach(function (entry) {
+        var option = document.createElement("option");
+        option.value = entry[0];
+        option.textContent = entry[1];
+        platformSelect.appendChild(option);
+    });
+
+    var genreSelect = document.getElementById("wishlist-genre-filter");
+    var genreEntries = Object.entries(genreMap).sort(function (a, b) {
+        return a[1].localeCompare(b[1]);
+    });
+    genreEntries.forEach(function (entry) {
+        var option = document.createElement("option");
+        option.value = entry[0];
+        option.textContent = entry[1];
+        genreSelect.appendChild(option);
+    });
+}
+
+async function filterWishlistByPlatform(platformId) {
+    var endpoint = platformId ? "/wishlist/platform/" + platformId : "/wishlist";
+    var response = await fetch(endpoint);
+    var items = await response.json();
+
+    currentWishlistItems = items;
+    renderWishlistGrid(sortWishlist(currentWishlistItems));
+}
+
+async function filterWishlistByGenre(genreId) {
+    var endpoint = genreId ? "/wishlist/genre/" + genreId : "/wishlist";
+    var response = await fetch(endpoint);
+    var items = await response.json();
+
+    currentWishlistItems = items;
+    renderWishlistGrid(sortWishlist(currentWishlistItems));
+}
+
+function toggleWishlistSort() {
+    wishlistSortAscending = !wishlistSortAscending;
+
+    var buttonEl = document.getElementById("wishlist-sort-toggle");
+    var iconEl = buttonEl.querySelector("i");
+    iconEl.className = wishlistSortAscending ? "bi bi-arrow-down" : "bi bi-arrow-up";
+
+    renderWishlistGrid(sortWishlist(currentWishlistItems));
+}
+
+function sortWishlist(items) {
+    var sorted = items.slice();
+
+    sorted.sort(function (a, b) {
+        var comparison = a.title.localeCompare(b.title);
+        return wishlistSortAscending ? comparison : -comparison;
+    });
+
+    return sorted;
 }
 
 document.getElementById("wishlist-save-btn").addEventListener("click", handleWishlistSave);

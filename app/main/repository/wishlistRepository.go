@@ -128,3 +128,143 @@ func DeleteWishlistItem(pool *pgxpool.Pool, id int) error {
 
 	return nil
 }
+
+func GetWishlistItemsByTitle(pool *pgxpool.Pool, title string) ([]models.WishlistItem, error) {
+	var items []models.WishlistItem
+	var err error
+	var rows pgx.Rows
+
+	sql := "SELECT id, title, photo_url, release_year, notes, created_at FROM wishlist WHERE title ILIKE $1 ORDER BY created_at DESC"
+
+	rows, err = pool.Query(context.Background(), sql, "%"+title+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item models.WishlistItem
+		err = rows.Scan(&item.ID, &item.Title, &item.PhotoURL, &item.ReleaseYear, &item.Notes, &item.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		var platforms []models.Platform
+		platforms, err = GetPlatformsForWishlistItem(pool, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		for _, p := range platforms {
+			item.PlatformIDs = append(item.PlatformIDs, p.ID)
+		}
+
+		var genres []models.Genre
+		genres, err = GetGenresForWishlistItem(pool, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		for _, g := range genres {
+			item.GenreIDs = append(item.GenreIDs, g.ID)
+		}
+
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
+func GetWishlistItemsByPlatform(pool *pgxpool.Pool, platformID int) ([]models.WishlistItem, error) {
+	var items []models.WishlistItem
+	var err error
+	var rows pgx.Rows
+
+	sql := `SELECT w.id, w.title, w.photo_url, w.release_year, w.notes, w.created_at
+			FROM wishlist w
+			JOIN wishlist_platforms wp ON wp.wishlist_id = w.id
+			WHERE wp.platform_id = $1
+			ORDER BY w.created_at DESC`
+
+	rows, err = pool.Query(context.Background(), sql, platformID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item models.WishlistItem
+		err = rows.Scan(&item.ID, &item.Title, &item.PhotoURL, &item.ReleaseYear, &item.Notes, &item.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		var platforms []models.Platform
+		platforms, err = GetPlatformsForWishlistItem(pool, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		for _, p := range platforms {
+			item.PlatformIDs = append(item.PlatformIDs, p.ID)
+		}
+
+		var genres []models.Genre
+		genres, err = GetGenresForWishlistItem(pool, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		for _, g := range genres {
+			item.GenreIDs = append(item.GenreIDs, g.ID)
+		}
+
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
+func GetWishlistItemsByGenre(pool *pgxpool.Pool, genreID int) ([]models.WishlistItem, error) {
+	var items []models.WishlistItem
+	var err error
+	var rows pgx.Rows
+
+	sql := `SELECT w.id, w.title, w.photo_url, w.release_year, w.notes, w.created_at
+			FROM wishlist w
+			JOIN wishlist_genres wg ON wg.wishlist_id = w.id
+			WHERE wg.genre_id = $1
+			ORDER BY w.created_at DESC`
+
+	rows, err = pool.Query(context.Background(), sql, genreID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item models.WishlistItem
+		err = rows.Scan(&item.ID, &item.Title, &item.PhotoURL, &item.ReleaseYear, &item.Notes, &item.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		var platforms []models.Platform
+		platforms, err = GetPlatformsForWishlistItem(pool, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		for _, p := range platforms {
+			item.PlatformIDs = append(item.PlatformIDs, p.ID)
+		}
+
+		var genres []models.Genre
+		genres, err = GetGenresForWishlistItem(pool, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		for _, g := range genres {
+			item.GenreIDs = append(item.GenreIDs, g.ID)
+		}
+
+		items = append(items, item)
+	}
+
+	return items, nil
+}

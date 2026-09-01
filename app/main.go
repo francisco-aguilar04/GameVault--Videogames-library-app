@@ -77,6 +77,9 @@ func main() {
 	router.PUT("/wishlist/:id", handlers.UpdateWishlistItemHandler(pool))
 	router.DELETE("/wishlist/:id", handlers.DeleteWishlistItemHandler(pool))
 	router.POST("/wishlist/:id/move-to-library", handlers.MoveToLibraryHandler(pool))
+	router.GET("/wishlist/title/:title", handlers.GetWishlistItemsByTitleHandler(pool))
+	router.GET("/wishlist/platform/:platformId", handlers.GetWishlistItemsByPlatformHandler(pool))
+	router.GET("/wishlist/genre/:genreId", handlers.GetWishlistItemsByGenreHandler(pool))
 
 	router.GET("/export/csv", handlers.ExportCSVHandler(pool))
 
