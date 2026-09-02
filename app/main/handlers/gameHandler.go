@@ -149,6 +149,28 @@ func GetGamesByPlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	}
 }
 
+func GetGamesByGenreHandler(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var genreID int
+		var err error
+
+		genreID, err = strconv.Atoi(c.Param("genreId"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "id inválido"})
+			return
+		}
+
+		var games []models.Game
+		games, err = service.GetGamesByGenre(pool, genreID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+			return
+		}
+
+		c.JSON(http.StatusOK, games)
+	}
+}
+
 func GetAllGamesHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 

@@ -65,7 +65,15 @@
 
                 </div>
 
-                <div class="col-auto px-0 d-flex">
+                <div class="col-auto px-0">
+
+                    <select id="genre-filter" class="form-select" onchange="filterGamesByGenre(this.value)">
+                        <option value="">Todos los géneros</option>
+                    </select>
+
+                </div>
+
+                <div class="col-auto  d-flex">
                     <button class="btn btn-primary btn-sm text-white fw-bold rounded-3 ps-3 pe-2 py-1 shadow-sm me-1"
                         type="button" id="sort-toggle" onclick="toggleSort()">
                         A-Z<i class="bi bi-arrow-down"></i>

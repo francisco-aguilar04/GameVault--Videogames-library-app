@@ -128,7 +128,6 @@ document.getElementById("title-search").addEventListener("keydown", function (e)
 	}
 });
 
-
 async function filterGamesByPlatform(platformId) {
 	var endpoint;
 	var response;
@@ -175,6 +174,50 @@ function populatePlatformFilter() {
 	}
 }
 
+function populateGenreFilter() {
+	var selectEl = document.getElementById("genre-filter");
+	var genreEntries = Object.entries(genreMap).sort(function (a, b) {
+		return a[1].localeCompare(b[1]);
+	});
+
+	genreEntries.forEach(function (entry) {
+		var option = document.createElement("option");
+		option.value = entry[0];
+		option.textContent = entry[1];
+		selectEl.appendChild(option);
+	});
+}
+
+async function filterGamesByGenre(genreId) {
+	var endpoint;
+	var response;
+	var games;
+	var gridEl;
+
+	await loadMaps();
+
+	endpoint = genreId ? "/games/genre/" + genreId : "/games";
+
+	try {
+		response = await fetch(endpoint);
+
+		if (!response.ok) {
+			throw new Error("Error en la respuesta del servidor");
+		}
+
+		games = await response.json();
+
+		currentGames = games;
+		renderGames(sortGames(currentGames), platformMap, genreMap);
+
+	} catch (err) {
+		console.error(err);
+
+		gridEl = document.getElementById("games-grid");
+
+		gridEl.innerHTML = '<p class="text-danger">Error al cargar los juegos filtrados.</p>';
+	}
+}
 
 function toggleSort() {
 	sortAscending = !sortAscending;
@@ -486,6 +529,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 		await loadMaps();
 
 		populatePlatformFilter();
+
+		populateGenreFilter();
 
 	} catch (error) {
 		console.error("Error al inicializar la página:", error);
