@@ -93,3 +93,20 @@ func DeletePlatform(pool *pgxpool.Pool, id int) error {
 
 	return nil
 }
+
+func GetOrCreatePlatformByName(pool *pgxpool.Pool, name string) (models.Platform, error) {
+	var platform models.Platform
+	var err error
+
+	err = pool.QueryRow(context.Background(), "SELECT id, name FROM platforms WHERE name = $1", name).
+		Scan(&platform.ID, &platform.Name)
+
+	if err == pgx.ErrNoRows {
+		return CreatePlatform(pool, name)
+	}
+	if err != nil {
+		return models.Platform{}, err
+	}
+
+	return platform, nil
+}

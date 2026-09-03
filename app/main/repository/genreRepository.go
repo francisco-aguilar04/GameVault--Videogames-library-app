@@ -103,3 +103,20 @@ func DeleteGenre(pool *pgxpool.Pool, id int) error {
 
 	return nil
 }
+
+func GetOrCreateGenreByName(pool *pgxpool.Pool, name string) (models.Genre, error) {
+	var genre models.Genre
+	var err error
+
+	err = pool.QueryRow(context.Background(), "SELECT id, name FROM genres WHERE name = $1", name).
+		Scan(&genre.ID, &genre.Name)
+
+	if err == pgx.ErrNoRows {
+		return CreateGenre(pool, name)
+	}
+	if err != nil {
+		return models.Genre{}, err
+	}
+
+	return genre, nil
+}
