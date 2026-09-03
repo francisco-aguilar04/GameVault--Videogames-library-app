@@ -103,3 +103,57 @@ func MoveToLibrary(pool *pgxpool.Pool, wishlistID int) (models.Game, error) {
 
 	return game, nil
 }
+
+type WishlistImportRow struct {
+	Title         string
+	ReleaseYear   *int
+	PhotoURL      *string
+	Notes         *string
+	PlatformNames []string
+	GenreNames    []string
+}
+
+func ReplaceWishlistFromCSV(pool *pgxpool.Pool, rows []WishlistImportRow) (int, error) {
+	var err error
+	var count int
+
+	err = repository.DeleteAllWishlistItems(pool)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, row := range rows {
+		var newItem models.WishlistItem
+		newItem.Title = row.Title
+		newItem.ReleaseYear = row.ReleaseYear
+		newItem.PhotoURL = row.PhotoURL
+		newItem.Notes = row.Notes
+
+		for _, name := range row.PlatformNames {
+			var platform models.Platform
+			platform, err = repository.GetOrCreatePlatformByName(pool, name)
+			if err != nil {
+				return count, err
+			}
+			newItem.PlatformIDs = append(newItem.PlatformIDs, platform.ID)
+		}
+
+		for _, name := range row.GenreNames {
+			var genre models.Genre
+			genre, err = repository.GetOrCreateGenreByName(pool, name)
+			if err != nil {
+				return count, err
+			}
+			newItem.GenreIDs = append(newItem.GenreIDs, genre.ID)
+		}
+
+		_, err = CreateWishlistItem(pool, newItem)
+		if err != nil {
+			return count, err
+		}
+
+		count++
+	}
+
+	return count, nil
+}

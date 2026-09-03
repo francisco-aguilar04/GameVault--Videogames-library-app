@@ -177,3 +177,61 @@ func GetGamesByGenre(pool *pgxpool.Pool, genreID int) ([]models.Game, error) {
 
 	return games, nil
 }
+
+type ImportRow struct {
+	Title         string
+	Status        string
+	Rating        *float64
+	ReleaseYear   *int
+	PhotoURL      *string
+	Review        *string
+	PlatformNames []string
+	GenreNames    []string
+}
+
+func ReplaceLibraryFromCSV(pool *pgxpool.Pool, rows []ImportRow) (int, error) {
+	var err error
+	var count int
+
+	err = repository.DeleteAllGames(pool)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, row := range rows {
+		var newGame models.Game
+		newGame.Title = row.Title
+		newGame.Status = row.Status
+		newGame.Rating = row.Rating
+		newGame.ReleaseYear = row.ReleaseYear
+		newGame.PhotoURL = row.PhotoURL
+		newGame.Review = row.Review
+
+		for _, name := range row.PlatformNames {
+			var platform models.Platform
+			platform, err = repository.GetOrCreatePlatformByName(pool, name)
+			if err != nil {
+				return count, err
+			}
+			newGame.PlatformIDs = append(newGame.PlatformIDs, platform.ID)
+		}
+
+		for _, name := range row.GenreNames {
+			var genre models.Genre
+			genre, err = repository.GetOrCreateGenreByName(pool, name)
+			if err != nil {
+				return count, err
+			}
+			newGame.GenreIDs = append(newGame.GenreIDs, genre.ID)
+		}
+
+		_, err = CreateGame(pool, newGame)
+		if err != nil {
+			return count, err
+		}
+
+		count++
+	}
+
+	return count, nil
+}

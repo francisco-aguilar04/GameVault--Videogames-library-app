@@ -268,3 +268,14 @@ func GetWishlistItemsByGenre(pool *pgxpool.Pool, genreID int) ([]models.Wishlist
 
 	return items, nil
 }
+
+func DeleteAllWishlistItems(pool *pgxpool.Pool) error {
+	var err error
+
+	_, err = pool.Exec(context.Background(), "DELETE FROM wishlist")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

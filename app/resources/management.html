@@ -120,13 +120,28 @@
 
                 <div id="panel-export" class="accordion-collapse collapse" data-bs-parent="#management-accordion">
 
-                    <div class="accordion-body d-flex gap-2">
-                        <button class="btn btn-primary" id="export-csv-btn">
-                            <i class="bi bi-download"></i> Exportar biblioteca
-                        </button>
-                        <button class="btn btn-primary" id="export-wishlist-csv-btn">
-                            <i class="bi bi-download"></i> Exportar wishlist
-                        </button>
+                    <div class="accordion-body d-flex flex-column gap-2">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" id="export-csv-btn">
+                                <i class="bi bi-download"></i> Exportar biblioteca
+                            </button>
+                            <button class="btn btn-primary" id="export-wishlist-csv-btn">
+                                <i class="bi bi-download"></i> Exportar wishlist
+                            </button>
+                        </div>
+                        <hr class="border-secondary my-1">
+                        <div>
+                            <label class="form-label small text-danger">Importar biblioteca (⚠️ reemplaza todo lo
+                                actual)</label>
+                            <input type="file" id="import-csv-input" accept=".csv"
+                                class="form-control form-control-sm w-25">
+                        </div>
+                        <div>
+                            <label class="form-label small text-danger">Importar wishlist (⚠️ reemplaza todo lo
+                                actual)</label>
+                            <input type="file" id="import-wishlist-csv-input" accept=".csv"
+                                class="form-control form-control-sm w-25">
+                        </div>
                     </div>
 
                 </div>

@@ -612,6 +612,86 @@ document.getElementById("export-wishlist-csv-btn").addEventListener("click", fun
     window.location.href = "/export/wishlist-csv";
 });
 
+document.getElementById("import-csv-input").addEventListener("change", async function (event) {
+    var file;
+    var formData;
+    var response;
+    var result;
+
+    file = event.target.files[0];
+    if (!file) {
+        return;
+    }
+
+    if (!confirm("Esto BORRARÁ tu biblioteca actual y la reemplazará por el contenido del CSV. ¿Continuar?")) {
+        event.target.value = "";
+        return;
+    }
+
+    formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        response = await fetch("/import/csv", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al importar");
+        }
+
+        result = await response.json();
+        alert("Importados " + result.imported + " juegos correctamente.");
+
+    } catch (err) {
+        console.error(err);
+        alert("No se pudo importar el CSV.");
+    } finally {
+        event.target.value = "";
+    }
+});
+
+document.getElementById("import-wishlist-csv-input").addEventListener("change", async function (event) {
+    var file;
+    var formData;
+    var response;
+    var result;
+
+    file = event.target.files[0];
+    if (!file) {
+        return;
+    }
+
+    if (!confirm("Esto BORRARÁ tu wishlist actual y la reemplazará por el contenido del CSV. ¿Continuar?")) {
+        event.target.value = "";
+        return;
+    }
+
+    formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        response = await fetch("/import/wishlist-csv", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al importar");
+        }
+
+        result = await response.json();
+        alert("Importados " + result.imported + " deseados correctamente.");
+
+    } catch (err) {
+        console.error(err);
+        alert("No se pudo importar el CSV.");
+    } finally {
+        event.target.value = "";
+    }
+});
+
 loadHeader();
 renderAddGameForm();
 renderAddPlatformForm();
