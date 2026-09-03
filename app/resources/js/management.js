@@ -318,9 +318,9 @@ function renderAddGenreForm() {
     var container = document.getElementById("add-genre-form");
 
     container.innerHTML =
-        '<form id="genre-form" class="d-flex gap-2">' +
+        '<form id="genre-form" class="d-flex gap-2" style="max-width: 600px;">' +
         '<input type="text" id="genre-name-input" class="form-control" placeholder="Nombre del género" required maxlength="100">' +
-        '<button type="submit" class="btn btn-outline-primary">Añadir</button>' +
+        '<button type="submit" class="btn btn-primary">Añadir</button>' +
         '</form>' +
         '<p id="genre-form-message" class="mt-2 mb-0 small"></p>';
 
@@ -507,34 +507,36 @@ async function renderAddWishlistForm() {
     container.innerHTML = `
 		<form id="wishlist-form">
 			<div class="row mb-2">
-				<div class="col-6">
+				<div class="col-4">
 					<label class="form-label small">Título</label>
 					<input type="text" id="wishlist-title-input" class="form-control" required maxlength="255">
 				</div>
-				<div class="col-3">
+				<div class="col-1">
 					<label class="form-label small">Año</label>
 					<input type="number" id="wishlist-year-input" class="form-control" min="1950" max="${currentYear}">
 				</div>
-				<div class="col-3">
+				<div class="col-8">
 					<label class="form-label small">URL de la foto</label>
 					<input type="url" id="wishlist-photo-input" class="form-control">
 				</div>
 			</div>
 			<div class="row mb-2">
-				<div class="col-6 text-light">
+				<div class="col-4 text-light">
 					<label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
 					${platformOptions}
 				</div>
-				<div class="col-6 text-light">
+				<div class="col-4 text-light">
 					<label class="form-label small">Géneros <span>(Ctrl/Cmd)</span></label>
 					${genreOptions}
 				</div>
 			</div>
-			<div class="mb-3">
-				<label class="form-label small">Notas</label>
-				<textarea id="wishlist-notes-input" class="form-control" rows="2"></textarea>
+			<div class="row mb-3">
+                <div class="col-8">
+                    <label class="form-label small">Notas</label>
+                    <textarea id="wishlist-notes-input" class="form-control" rows="2"></textarea>
+                </div>
 			</div>
-			<button type="submit" class="btn btn-outline-primary">Añadir a wishlist</button>
+			<button type="submit" class="btn btn-primary">Añadir a wishlist</button>
 		</form>
 		<p id="wishlist-form-message" class="mt-2 mb-0 small"></p>
 	`;
