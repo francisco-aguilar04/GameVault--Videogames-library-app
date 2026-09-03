@@ -608,6 +608,10 @@ document.getElementById("export-csv-btn").addEventListener("click", function () 
     window.location.href = "/export/csv";
 });
 
+document.getElementById("export-wishlist-csv-btn").addEventListener("click", function () {
+    window.location.href = "/export/wishlist-csv";
+});
+
 loadHeader();
 renderAddGameForm();
 renderAddPlatformForm();
