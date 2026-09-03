@@ -83,6 +83,7 @@ func main() {
 	router.GET("/wishlist/genre/:genreId", handlers.GetWishlistItemsByGenreHandler(pool))
 
 	router.GET("/export/csv", handlers.ExportCSVHandler(pool))
+	router.GET("/export/wishlist-csv", handlers.ExportWishlistCSVHandler(pool))
 
 	// Health check endpoint: reports whether the database connection is alive
 	router.GET("/health", func(c *gin.Context) {
