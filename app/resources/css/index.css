@@ -92,3 +92,27 @@ header {
     border-radius: 8px;
     padding: 8px 10px;
 }
+
+.page-link {
+    background-color: var(--bs-secondary);
+    border: 1px solid #4a3f8a;
+    color: var(--bs-light);
+}
+
+.page-link:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
+}
+
+.page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--bs-dark);
+    border-color: var(--bs-secondary);
+    color: var(--bs-secondary-color);
+}

@@ -3,6 +3,11 @@ var platformMap = {};
 var genreMap = {};
 var mapsLoaded = false;
 
+//For pagination
+var PAGE_SIZE = 30;
+var currentPage = 1;
+var fullGamesList = [];
+
 var currentGames = [];
 var sortAscending = true;
 
@@ -292,21 +297,71 @@ function markActiveLink() {
 
 // Gamecards building
 
-function renderGames(games, platformMap, genreMap) {
-	var gridEl;
+function renderGames(games, pMap, gMap) {
+	fullGamesList = games || [];
+	platformMap = pMap;
+	genreMap = gMap;
+	currentPage = 1;
+	renderGamesPage();
+}
 
-	gridEl = document.getElementById("games-grid");
+function renderGamesPage() {
+	var gridEl = document.getElementById("games-grid");
+	var start;
+	var pageItems;
 
-	if (!games || games.length === 0) {
-		gridEl.innerHTML = '<p class="text-secondary">No se encontraron juegos en esta sección.</p>';
+	if (!fullGamesList || fullGamesList.length === 0) {
+		gridEl.innerHTML = '<p class="text-secondary">Todavía no hay juegos en tu biblioteca.</p>';
+		document.getElementById("pagination").innerHTML = "";
 		return;
 	}
 
-	gridEl.innerHTML = "";
+	start = (currentPage - 1) * PAGE_SIZE;
+	pageItems = fullGamesList.slice(start, start + PAGE_SIZE);
 
-	games.forEach(function (game) {
+	gridEl.innerHTML = "";
+	pageItems.forEach(function (game) {
 		gridEl.appendChild(buildGameCard(game, platformMap, genreMap));
 	});
+
+	renderPaginationControls();
+}
+
+function renderPaginationControls() {
+	var paginationEl = document.getElementById("pagination");
+	var totalPages = Math.ceil(fullGamesList.length / PAGE_SIZE);
+	var i;
+	var html = "";
+
+	if (totalPages <= 1) {
+		paginationEl.innerHTML = "";
+		return;
+	}
+
+	html += '<li class="page-item' + (currentPage === 1 ? ' disabled' : '') + '">' +
+		'<button class="page-link" onclick="goToPage(' + (currentPage - 1) + ')">Anterior</button></li>';
+
+	for (i = 1; i <= totalPages; i++) {
+		html += '<li class="page-item' + (i === currentPage ? ' active' : '') + '">' +
+			'<button class="page-link" onclick="goToPage(' + i + ')">' + i + '</button></li>';
+	}
+
+	html += '<li class="page-item' + (currentPage === totalPages ? ' disabled' : '') + '">' +
+		'<button class="page-link" onclick="goToPage(' + (currentPage + 1) + ')">Siguiente</button></li>';
+
+	paginationEl.innerHTML = html;
+}
+
+function goToPage(page) {
+	var totalPages = Math.ceil(fullGamesList.length / PAGE_SIZE);
+
+	if (page < 1 || page > totalPages) {
+		return;
+	}
+
+	currentPage = page;
+	renderGamesPage();
+	window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function buildGameCard(game, platformMap, genreMap) {
