@@ -9,15 +9,13 @@ import (
 	"gamevault-backend/main/models"
 )
 
-func CreatePlatform(pool *pgxpool.Pool, name string) (models.Platform, error) {
+func CreatePlatform(pool *pgxpool.Pool, name string, color string) (models.Platform, error) {
 	var platform models.Platform
 	var err error
 
-	//Creates the sql instruction where $1 is the value of name parameter (first parameter)
-	sql := "INSERT INTO platforms (name) VALUES ($1) RETURNING id, name"
+	sql := "INSERT INTO platforms (name, color) VALUES ($1, $2) RETURNING id, name, color"
 
-	//Executes the instruction in sql with parameter name, using scan to do it (ID is serial)
-	err = pool.QueryRow(context.Background(), sql, name).Scan(&platform.ID, &platform.Name)
+	err = pool.QueryRow(context.Background(), sql, name, color).Scan(&platform.ID, &platform.Name, &platform.Color)
 	if err != nil {
 		return models.Platform{}, err
 	}
@@ -29,9 +27,9 @@ func GetPlatformByID(pool *pgxpool.Pool, id int) (models.Platform, error) {
 	var platform models.Platform
 	var err error
 
-	sql := "SELECT id, name FROM platforms WHERE id = $1"
+	sql := "SELECT id, name, color FROM platforms WHERE id = $1"
 
-	err = pool.QueryRow(context.Background(), sql, id).Scan(&platform.ID, &platform.Name)
+	err = pool.QueryRow(context.Background(), sql, id).Scan(&platform.ID, &platform.Name, &platform.Color)
 	if err != nil {
 		return models.Platform{}, err
 	}
@@ -44,7 +42,7 @@ func GetAllPlatforms(pool *pgxpool.Pool) ([]models.Platform, error) {
 	var err error
 	var rows pgx.Rows
 
-	sql := "SELECT id, name FROM platforms ORDER BY name"
+	sql := "SELECT id, name, color FROM platforms ORDER BY name"
 
 	rows, err = pool.Query(context.Background(), sql)
 	if err != nil {
@@ -54,7 +52,7 @@ func GetAllPlatforms(pool *pgxpool.Pool) ([]models.Platform, error) {
 
 	for rows.Next() {
 		var platform models.Platform
-		err = rows.Scan(&platform.ID, &platform.Name)
+		err = rows.Scan(&platform.ID, &platform.Name, &platform.Color)
 		if err != nil {
 			return nil, err
 		}
@@ -64,13 +62,13 @@ func GetAllPlatforms(pool *pgxpool.Pool) ([]models.Platform, error) {
 	return platforms, nil
 }
 
-func UpdatePlatform(pool *pgxpool.Pool, id int, name string) (models.Platform, error) {
+func UpdatePlatform(pool *pgxpool.Pool, id int, name string, color string) (models.Platform, error) {
 	var platform models.Platform
 	var err error
 
-	sql := "UPDATE platforms SET name = $1 WHERE id = $2 RETURNING id, name"
+	sql := "UPDATE platforms SET name = $1, color = $2 WHERE id = $3 RETURNING id, name, color"
 
-	err = pool.QueryRow(context.Background(), sql, name, id).Scan(&platform.ID, &platform.Name)
+	err = pool.QueryRow(context.Background(), sql, name, color, id).Scan(&platform.ID, &platform.Name, &platform.Color)
 	if err != nil {
 		return models.Platform{}, err
 	}
@@ -98,11 +96,11 @@ func GetOrCreatePlatformByName(pool *pgxpool.Pool, name string) (models.Platform
 	var platform models.Platform
 	var err error
 
-	err = pool.QueryRow(context.Background(), "SELECT id, name FROM platforms WHERE name = $1", name).
-		Scan(&platform.ID, &platform.Name)
+	err = pool.QueryRow(context.Background(), "SELECT id, name, color FROM platforms WHERE name = $1", name).
+		Scan(&platform.ID, &platform.Name, &platform.Color)
 
 	if err == pgx.ErrNoRows {
-		return CreatePlatform(pool, name)
+		return CreatePlatform(pool, name, "#6c757d")
 	}
 	if err != nil {
 		return models.Platform{}, err

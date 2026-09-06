@@ -4,6 +4,7 @@ function renderAddPlatformForm() {
     container.innerHTML = `
         <form id="platform-form" class="d-flex gap-2" style="max-width: 600px;">
             <input type="text" id="platform-name-input" class="form-control flex-grow-1" placeholder="Nombre de la plataforma" required maxlength="100">
+            <input type="color" id="platform-color-input" class="form-control form-control-color" value="#6c757d" title="Color de la etiqueta">
             <button type="submit" class="btn btn-primary">Añadir</button>
         </form>
         <p id="platform-form-message" class="mt-2 mb-0 small"></p>
@@ -33,7 +34,7 @@ async function handleAddPlatform(event) {
         response = await fetch("/platforms", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: name })
+            body: JSON.stringify({ name: name, color: document.getElementById("platform-color-input").value })
         });
 
         if (!response.ok) {
@@ -227,6 +228,7 @@ async function renderPlatformsTable() {
             html += `
 			<td class="p-0" data-id="${platformsList[j].id}">
 				<div class="input-group input-group-sm w-100">
+					<input type="color" class="form-control form-control-color platform-color-input" value="${platformsList[j].color}">
 					<input type="text" class="form-control platform-name-input" value="${platformsList[j].name}" maxlength="100">
 					<button class="btn btn-success platform-save-btn" type="button" title="Guardar"><i class="bi bi-check"></i></button>
 					<button class="btn btn-danger platform-delete-btn me-5" type="button" title="Borrar"><i class="bi bi-trash"></i></button>
@@ -251,36 +253,23 @@ async function renderPlatformsTable() {
 }
 
 async function handlePlatformSave(event) {
-    var cell;
-    var id;
-    var input;
-    var newName;
-    var response;
+    var cell = event.target.closest("td");
+    var id = cell.getAttribute("data-id");
+    var nameInput = cell.querySelector(".platform-name-input");
+    var colorInput = cell.querySelector(".platform-color-input");
+    var newName = nameInput.value.trim();
+    var newColor = colorInput.value;
 
-    cell = event.target.closest("td");
-    id = cell.getAttribute("data-id");
-    input = cell.querySelector(".platform-name-input");
-    newName = input.value.trim();
-
-    if (!newName) {
-        return;
-    }
-
-    if (!confirm('¿Cambiar el nombre a "' + newName + '"?')) {
-        return;
-    }
+    if (!newName) return;
+    if (!confirm('¿Cambiar el nombre a "' + newName + '"?')) return;
 
     try {
-        response = await fetch("/platforms/" + id, {
+        var response = await fetch("/platforms/" + id, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: newName })
+            body: JSON.stringify({ name: newName, color: newColor })
         });
-
-        if (!response.ok) {
-            throw new Error("Error al actualizar");
-        }
-
+        if (!response.ok) throw new Error("Error al actualizar");
     } catch (err) {
         console.error(err);
         alert("No se pudo actualizar la plataforma.");
@@ -561,8 +550,6 @@ async function handleAddWishlistItem(event) {
     yearInput = document.getElementById("wishlist-year-input");
     photoInput = document.getElementById("wishlist-photo-input");
     notesInput = document.getElementById("wishlist-notes-input");
-    platformsSelect = document.getElementById("wishlist-platforms-input");
-    genresSelect = document.getElementById("wishlist-genres-input");
     messageEl = document.getElementById("wishlist-form-message");
 
     platformIds = getCheckedIds("wishlist-platform");

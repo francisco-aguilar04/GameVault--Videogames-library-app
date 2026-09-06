@@ -164,7 +164,8 @@ function populateHero(game) {
         var name = platformMap[id];
         if (name) {
             var pill = document.createElement("span");
-            pill.className = "badge " + platformBadgeClass(name) + " bg-opacity-75";
+            pill.className = "badge";
+            pill.style.backgroundColor = platformColorMap[id] || "#6c757d";
             pill.textContent = name;
             heroPlatforms.appendChild(pill);
         }

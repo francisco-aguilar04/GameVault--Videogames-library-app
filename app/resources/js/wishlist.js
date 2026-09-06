@@ -60,7 +60,8 @@ function buildWishlistCard(item) {
         var name = platformMap[id];
         if (name) {
             var pill = document.createElement("span");
-            pill.className = "badge rounded-pill bg-opacity-75 me-1 mb-1 " + platformBadgeClass(name);
+            pill.className = "badge rounded-pill me-1 mb-1";
+            pill.style.backgroundColor = platformColorMap[id] || "#6c757d";
             pill.textContent = name;
             pillsEl.appendChild(pill);
         }
