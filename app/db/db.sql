@@ -1,6 +1,7 @@
 CREATE TABLE platforms (
-    id    SERIAL PRIMARY KEY,
-    name  VARCHAR(100) NOT NULL UNIQUE
+    id     SERIAL PRIMARY KEY,
+    name   VARCHAR(100) NOT NULL UNIQUE,
+    color  VARCHAR(7) NOT NULL DEFAULT '#6c757d'
 );
 
 CREATE TABLE games (

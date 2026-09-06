@@ -18,21 +18,24 @@ func CreatePlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var input models.Platform
 		var err error
-		var platform models.Platform
 
 		err = c.ShouldBindJSON(&input)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
 			return
 		}
 
-		platform, err = repository.CreatePlatform(pool, input.Name)
+		if input.Color == "" {
+			input.Color = "#6c757d"
+		}
+
+		var platform models.Platform
+		platform, err = repository.CreatePlatform(pool, input.Name, input.Color)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		// 201 Created: the operation created a resource, so we retrieve it
 		c.JSON(http.StatusCreated, platform)
 	}
 }
@@ -82,24 +85,24 @@ func UpdatePlatformHandler(pool *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var id int
 		var err error
-		var input models.Platform
-		var platform models.Platform
 
 		id, err = strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": "invalid ID"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "id inválido"})
 			return
 		}
 
+		var input models.Platform
 		err = c.ShouldBindJSON(&input)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": "invalid JSON"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
 			return
 		}
 
-		platform, err = repository.UpdatePlatform(pool, id, input.Name)
+		var platform models.Platform
+		platform, err = repository.UpdatePlatform(pool, id, input.Name, input.Color)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"Error": "platform not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "plataforma no encontrada"})
 			return
 		}
 

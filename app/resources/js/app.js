@@ -2,6 +2,7 @@ var MAX_VISIBLE_GENRES = 2;
 var platformMap = {};
 var genreMap = {};
 var mapsLoaded = false;
+var platformColorMap = {};
 
 //For pagination
 var PAGE_SIZE = 30;
@@ -30,6 +31,7 @@ async function loadMaps() {
 	if (platformsList) {
 		platformsList.forEach(function (p) {
 			platformMap[p.id] = p.name;
+			platformColorMap[p.id] = p.color;
 		});
 	}
 
@@ -422,7 +424,8 @@ function buildGameCard(game, platformMap, genreMap) {
 
 		if (name) {
 			pill = document.createElement("span");
-			pill.className = "badge bg-opacity-75 me-1 " + platformBadgeClass(name);
+			pill.className = "badge me-1";
+			pill.style.backgroundColor = platformColorMap[id] || "#6c757d";
 			pill.textContent = name;
 			pillsEl.appendChild(pill);
 		}
