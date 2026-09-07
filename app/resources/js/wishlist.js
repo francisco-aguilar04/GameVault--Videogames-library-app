@@ -1,5 +1,8 @@
+// Global variable to keep track of the Bootstrap modal instance for the wishlist
 var wishlistModal;
 
+// Fetches all wishlist items from the API, ensuring maps and filters are loaded first,
+// then stores the items locally and renders the sorted wishlist grid.
 async function loadWishlist() {
     var response;
     var items;
@@ -14,6 +17,8 @@ async function loadWishlist() {
     renderWishlistGrid(sortWishlist(currentWishlistItems));
 }
 
+// Renders the wishlist items into the grid container.
+// Displays a fallback message if the wishlist is empty.
 function renderWishlistGrid(items) {
     var gridEl = document.getElementById("wishlist-grid");
 
@@ -28,6 +33,8 @@ function renderWishlistGrid(items) {
     });
 }
 
+// Builds an individual wishlist card element using an HTML template,
+// filling in cover images, titles, release years, genre badges, and platform pills.
 function buildWishlistCard(item) {
     var template = document.getElementById("wishlist-card-template");
     var clone = template.content.cloneNode(true);
@@ -70,6 +77,8 @@ function buildWishlistCard(item) {
     return clone;
 }
 
+// Fetches full details for a specific wishlist item and populates the edit modal fields,
+// initializing the modal instance if it does not yet exist.
 async function openWishlistModal(id) {
     var response;
     var item;
@@ -108,6 +117,8 @@ async function openWishlistModal(id) {
     wishlistModal.show();
 }
 
+// Collects updated data from the wishlist modal form, sends a PUT request to the API,
+// hides the modal, and refreshes the wishlist view.
 async function handleWishlistSave() {
     var id;
     var platformIds;
@@ -154,6 +165,7 @@ async function handleWishlistSave() {
     }
 }
 
+// Deletes the current wishlist item after user confirmation.
 async function handleWishlistDelete() {
     var id;
     var response;
@@ -180,6 +192,8 @@ async function handleWishlistDelete() {
     }
 }
 
+// Moves a game from the wishlist to the main library via a POST request,
+// then closes the modal and refreshes the list.
 async function handleMoveToLibrary() {
     var id;
     var response;
@@ -206,6 +220,7 @@ async function handleMoveToLibrary() {
     }
 }
 
+// Filters the wishlist items based on an optional title search string.
 async function filterWishlistByTitle(title) {
     var endpoint;
     var response;
@@ -233,6 +248,7 @@ async function filterWishlistByTitle(title) {
     }
 }
 
+// Reads the search input value and triggers the title-based filtering process.
 function handleWishlistSearch() {
     var inputEl = document.getElementById("wishlist-search");
     var title = inputEl.value.trim();
@@ -240,6 +256,7 @@ function handleWishlistSearch() {
     filterWishlistByTitle(title);
 }
 
+// Listens for the "Enter" key on the wishlist search input to execute searches instantly.
 document.getElementById("wishlist-search").addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
         handleWishlistSearch();
@@ -249,6 +266,7 @@ document.getElementById("wishlist-search").addEventListener("keydown", function 
 var wishlistSortAscending = true;
 var currentWishlistItems = [];
 
+// Populates the platform and genre dropdown filters alphabetically based on maps data.
 async function populateWishlistFilters() {
     await loadMaps();
 
@@ -275,6 +293,7 @@ async function populateWishlistFilters() {
     });
 }
 
+// Filters wishlist items by a specific platform ID.
 async function filterWishlistByPlatform(platformId) {
     var endpoint = platformId ? "/wishlist/platform/" + platformId : "/wishlist";
     var response = await fetch(endpoint);
@@ -284,6 +303,7 @@ async function filterWishlistByPlatform(platformId) {
     renderWishlistGrid(sortWishlist(currentWishlistItems));
 }
 
+// Filters wishlist items by a specific genre ID.
 async function filterWishlistByGenre(genreId) {
     var endpoint = genreId ? "/wishlist/genre/" + genreId : "/wishlist";
     var response = await fetch(endpoint);
@@ -293,6 +313,7 @@ async function filterWishlistByGenre(genreId) {
     renderWishlistGrid(sortWishlist(currentWishlistItems));
 }
 
+// Toggles the sorting direction (ascending/descending) for the wishlist grid and updates UI icons.
 function toggleWishlistSort() {
     wishlistSortAscending = !wishlistSortAscending;
 
@@ -303,6 +324,7 @@ function toggleWishlistSort() {
     renderWishlistGrid(sortWishlist(currentWishlistItems));
 }
 
+// Sorts an array of wishlist items alphabetically by title based on current sort direction.
 function sortWishlist(items) {
     var sorted = items.slice();
 
@@ -314,9 +336,11 @@ function sortWishlist(items) {
     return sorted;
 }
 
+// Attach primary event listeners to modal buttons.
 document.getElementById("wishlist-save-btn").addEventListener("click", handleWishlistSave);
 document.getElementById("wishlist-delete-btn").addEventListener("click", handleWishlistDelete);
 document.getElementById("wishlist-move-btn").addEventListener("click", handleMoveToLibrary);
 
+// Initialize header and load wishlist data on startup.
 loadHeader();
 loadWishlist();

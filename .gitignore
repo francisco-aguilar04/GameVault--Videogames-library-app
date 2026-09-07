@@ -35,6 +35,7 @@ htmlcov/
 .env
 .env.local
 .env.*
+postgres.env
 
 # === EDITORES DE CÓDIGO Y SISTEMA ===
 .vscode/

@@ -1,3 +1,4 @@
+// Renders the HTML form used to add a new platform.
 function renderAddPlatformForm() {
     var container = document.getElementById("add-platform-form");
 
@@ -13,6 +14,8 @@ function renderAddPlatformForm() {
     document.getElementById("platform-form").addEventListener("submit", handleAddPlatform);
 }
 
+// Handles the submission of the new platform form.
+// Prevents page reload, sends the POST request, and refreshes the platform list on success.
 async function handleAddPlatform(event) {
     var nameInput;
     var name;
@@ -20,7 +23,7 @@ async function handleAddPlatform(event) {
     var response;
     var result;
 
-    event.preventDefault();
+    event.preventDefault(); // Stop form from reloading the page
 
     nameInput = document.getElementById("platform-name-input");
     name = nameInput.value.trim();
@@ -43,10 +46,12 @@ async function handleAddPlatform(event) {
 
         result = await response.json();
 
+        // Show success message and clear the input field
         messageEl.className = "mt-2 mb-0 small text-success";
         messageEl.textContent = "Plataforma \"" + result.name + "\" añadida correctamente.";
         nameInput.value = "";
 
+        // Refresh the table to show the newly added platform
         renderPlatformsTable();
 
     } catch (err) {
@@ -56,6 +61,8 @@ async function handleAddPlatform(event) {
     }
 }
 
+// Fetches available platforms and genres from the API, then renders
+// the form to add a new game, generating the checkboxes dynamically.
 async function renderAddGameForm() {
     var container = document.getElementById("add-game-form");
     var platformsResponse;
@@ -67,6 +74,7 @@ async function renderAddGameForm() {
     var currentYear;
     var i;
 
+    // Fetch dependencies needed for the checkboxes
     platformsResponse = await fetch("/platforms");
     platformsList = await platformsResponse.json();
 
@@ -80,9 +88,7 @@ async function renderAddGameForm() {
 
     container.innerHTML = `
         <form id="game-form">
-
             <div class="row mb-2">
-
                 <div class="col-4">
                     <label class="form-label small">Título</label>
                     <input type="text" id="game-title-input" class="form-control" required maxlength="255">
@@ -113,7 +119,6 @@ async function renderAddGameForm() {
                 </div>
             
                 <div class="row my-3">
-
                     <div class="col-4 text-light">
                         <label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
                         ${platformOptions}
@@ -123,7 +128,6 @@ async function renderAddGameForm() {
                         <label class="form-label small">Géneros <span>(Ctrl/Cmd)</span></label>
                         ${genreOptions}
                     </div>
-
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">Añadir juego</button>
@@ -134,6 +138,8 @@ async function renderAddGameForm() {
     document.getElementById("game-form").addEventListener("submit", handleAddGame);
 }
 
+// Reads the "add game" form and sends a POST request.
+// Only includes optional fields (year, rating, photo) if the user provided them.
 async function handleAddGame(event) {
     var titleInput;
     var statusInput;
@@ -160,6 +166,7 @@ async function handleAddGame(event) {
     platformIds = getCheckedIds("game-platform");
     genreIds = getCheckedIds("game-genre");
 
+    // Base payload with required fields
     payload = {
         title: titleInput.value.trim(),
         status: statusInput.value,
@@ -167,14 +174,13 @@ async function handleAddGame(event) {
         genre_ids: genreIds
     };
 
+    // Attach optional fields only if they have a value to avoid inserting null/empty strings
     if (yearInput.value) {
         payload.release_year = parseInt(yearInput.value, 10);
     }
-
     if (ratingInput.value) {
         payload.rating = parseFloat(ratingInput.value);
     }
-
     if (photoInput.value.trim()) {
         payload.photo_url = photoInput.value.trim();
     }
@@ -194,6 +200,8 @@ async function handleAddGame(event) {
 
         messageEl.className = "mt-2 mb-0 small text-success";
         messageEl.textContent = "Juego \"" + result.title + "\" añadido correctamente.";
+
+        // Clear the entire form after successful submission
         document.getElementById("game-form").reset();
 
     } catch (err) {
@@ -203,6 +211,8 @@ async function handleAddGame(event) {
     }
 }
 
+// Fetches platforms and renders them in a 4-column grid.
+// Each cell includes inline editing (name/color) and deletion controls.
 async function renderPlatformsTable() {
     var container = document.getElementById("platforms-table");
     var response;
@@ -219,22 +229,24 @@ async function renderPlatformsTable() {
         return;
     }
 
+    // Start a table with spaced cells for styling
     html = `<table class="table table-sm align-middle table-borderless rounded-table w-75" style="border-collapse: separate; border-spacing: 12px 12px;">`;
 
+    // Loop through the list, creating a new row every 4 items
     for (i = 0; i < platformsList.length; i += 4) {
         html += `<tr>`;
 
         for (j = i; j < i + 4 && j < platformsList.length; j++) {
             html += `
-			<td class="p-0" data-id="${platformsList[j].id}">
-				<div class="input-group input-group-sm w-100">
-					<input type="color" class="form-control form-control-color platform-color-input" value="${platformsList[j].color}">
-					<input type="text" class="form-control platform-name-input" value="${platformsList[j].name}" maxlength="100">
-					<button class="btn btn-success platform-save-btn" type="button" title="Guardar"><i class="bi bi-check"></i></button>
-					<button class="btn btn-danger platform-delete-btn me-5" type="button" title="Borrar"><i class="bi bi-trash"></i></button>
-				</div>
-			</td>
-		`;
+            <td class="p-0" data-id="${platformsList[j].id}">
+                <div class="input-group input-group-sm w-100">
+                    <input type="color" class="form-control form-control-color platform-color-input" value="${platformsList[j].color}">
+                    <input type="text" class="form-control platform-name-input" value="${platformsList[j].name}" maxlength="100">
+                    <button class="btn btn-success platform-save-btn" type="button" title="Guardar"><i class="bi bi-check"></i></button>
+                    <button class="btn btn-danger platform-delete-btn me-5" type="button" title="Borrar"><i class="bi bi-trash"></i></button>
+                </div>
+            </td>
+        `;
         }
 
         html += `</tr>`;
@@ -243,6 +255,7 @@ async function renderPlatformsTable() {
 
     container.innerHTML = html;
 
+    // Attach event listeners to the dynamically created inline buttons
     container.querySelectorAll(".platform-save-btn").forEach(function (btn) {
         btn.addEventListener("click", handlePlatformSave);
     });
@@ -252,6 +265,8 @@ async function renderPlatformsTable() {
     });
 }
 
+// Handles inline updating of a platform.
+// Finds the closest table cell to extract the ID and new input values.
 async function handlePlatformSave(event) {
     var cell = event.target.closest("td");
     var id = cell.getAttribute("data-id");
@@ -276,6 +291,8 @@ async function handlePlatformSave(event) {
     }
 }
 
+// Deletes a platform after user confirmation.
+// Note: Backend should block deletion if the platform is tied to existing games.
 async function handlePlatformDelete(event) {
     var cell;
     var id;
@@ -295,7 +312,7 @@ async function handlePlatformDelete(event) {
             throw new Error("Error al borrar");
         }
 
-        renderPlatformsTable();
+        renderPlatformsTable(); // Refresh UI
 
     } catch (err) {
         console.error(err);
@@ -303,6 +320,7 @@ async function handlePlatformDelete(event) {
     }
 }
 
+// Renders a simple inline form for creating a new genre.
 function renderAddGenreForm() {
     var container = document.getElementById("add-genre-form");
 
@@ -316,6 +334,7 @@ function renderAddGenreForm() {
     document.getElementById("genre-form").addEventListener("submit", handleAddGenre);
 }
 
+// Handles submitting the new genre form, similar to handleAddPlatform.
 async function handleAddGenre(event) {
     var nameInput;
     var name;
@@ -359,6 +378,7 @@ async function handleAddGenre(event) {
     }
 }
 
+// Fetches genres and renders them in a 4-column grid, matching the style of platforms.
 async function renderGenresTable() {
     var container = document.getElementById("genres-table");
     var response;
@@ -382,14 +402,14 @@ async function renderGenresTable() {
 
         for (j = i; j < i + 4 && j < genresList.length; j++) {
             html += `
-			<td class="p-0" data-id="${genresList[j].id}">
-				<div class="input-group input-group-sm w-100">
-					<input type="text" class="form-control genre-name-input" value="${genresList[j].name}" maxlength="100">
-					<button class="btn btn-success genre-save-btn" type="button" title="Guardar"><i class="bi bi-check"></i></button>
-					<button class="btn btn-danger genre-delete-btn me-5" type="button" title="Borrar"><i class="bi bi-trash"></i></button>
-				</div>
-			</td>
-		`;
+            <td class="p-0" data-id="${genresList[j].id}">
+                <div class="input-group input-group-sm w-100">
+                    <input type="text" class="form-control genre-name-input" value="${genresList[j].name}" maxlength="100">
+                    <button class="btn btn-success genre-save-btn" type="button" title="Guardar"><i class="bi bi-check"></i></button>
+                    <button class="btn btn-danger genre-delete-btn me-5" type="button" title="Borrar"><i class="bi bi-trash"></i></button>
+                </div>
+            </td>
+        `;
         }
 
         html += `</tr>`;
@@ -407,6 +427,7 @@ async function renderGenresTable() {
     });
 }
 
+// Handles inline updating of a genre name.
 async function handleGenreSave(event) {
     var cell;
     var id;
@@ -444,6 +465,7 @@ async function handleGenreSave(event) {
     }
 }
 
+// Deletes a genre after confirmation, failing if tied to existing games.
 async function handleGenreDelete(event) {
     var cell;
     var id;
@@ -471,6 +493,8 @@ async function handleGenreDelete(event) {
     }
 }
 
+// Renders the form for adding an item to the wishlist.
+// Shares similarities with the main game form but includes a "Notes" field.
 async function renderAddWishlistForm() {
     var container = document.getElementById("add-wishlist-form");
     var platformsResponse;
@@ -494,45 +518,47 @@ async function renderAddWishlistForm() {
     genreOptions = genresList ? buildCheckboxListHTML("wishlist-genre", genresList, []) : "";
 
     container.innerHTML = `
-		<form id="wishlist-form">
-			<div class="row mb-2">
-				<div class="col-4">
-					<label class="form-label small">Título</label>
-					<input type="text" id="wishlist-title-input" class="form-control" required maxlength="255">
-				</div>
-				<div class="col-1">
-					<label class="form-label small">Año</label>
-					<input type="number" id="wishlist-year-input" class="form-control" min="1950" max="${currentYear}">
-				</div>
-				<div class="col-8">
-					<label class="form-label small">URL de la foto</label>
-					<input type="url" id="wishlist-photo-input" class="form-control">
-				</div>
-			</div>
-			<div class="row mb-2">
-				<div class="col-4 text-light">
-					<label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
-					${platformOptions}
-				</div>
-				<div class="col-4 text-light">
-					<label class="form-label small">Géneros <span>(Ctrl/Cmd)</span></label>
-					${genreOptions}
-				</div>
-			</div>
-			<div class="row mb-3">
+        <form id="wishlist-form">
+            <div class="row mb-2">
+                <div class="col-4">
+                    <label class="form-label small">Título</label>
+                    <input type="text" id="wishlist-title-input" class="form-control" required maxlength="255">
+                </div>
+                <div class="col-1">
+                    <label class="form-label small">Año</label>
+                    <input type="number" id="wishlist-year-input" class="form-control" min="1950" max="${currentYear}">
+                </div>
+                <div class="col-8">
+                    <label class="form-label small">URL de la foto</label>
+                    <input type="url" id="wishlist-photo-input" class="form-control">
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-4 text-light">
+                    <label class="form-label small">Plataformas <span>(Ctrl/Cmd)</span></label>
+                    ${platformOptions}
+                </div>
+                <div class="col-4 text-light">
+                    <label class="form-label small">Géneros <span>(Ctrl/Cmd)</span></label>
+                    ${genreOptions}
+                </div>
+            </div>
+            <div class="row mb-3">
                 <div class="col-8">
                     <label class="form-label small">Notas</label>
                     <textarea id="wishlist-notes-input" class="form-control" rows="2"></textarea>
                 </div>
-			</div>
-			<button type="submit" class="btn btn-primary">Añadir a wishlist</button>
-		</form>
-		<p id="wishlist-form-message" class="mt-2 mb-0 small"></p>
-	`;
+            </div>
+            <button type="submit" class="btn btn-primary">Añadir a wishlist</button>
+        </form>
+        <p id="wishlist-form-message" class="mt-2 mb-0 small"></p>
+    `;
 
     document.getElementById("wishlist-form").addEventListener("submit", handleAddWishlistItem);
 }
 
+// Reads the wishlist form and sends a POST request.
+// Only includes optional fields (year, photo, notes) if provided.
 async function handleAddWishlistItem(event) {
     var titleInput;
     var yearInput;
@@ -593,6 +619,7 @@ async function handleAddWishlistItem(event) {
     }
 }
 
+// Export logic: redirects the browser to the endpoints that download the files.
 document.getElementById("export-csv-btn").addEventListener("click", function () {
     window.location.href = "/export/csv";
 });
@@ -601,6 +628,8 @@ document.getElementById("export-wishlist-csv-btn").addEventListener("click", fun
     window.location.href = "/export/wishlist-csv";
 });
 
+// Import logic for main library CSV.
+// Uploads the file via FormData and warns the user that this action overrides data.
 document.getElementById("import-csv-input").addEventListener("change", async function (event) {
     var file;
     var formData;
@@ -612,8 +641,9 @@ document.getElementById("import-csv-input").addEventListener("change", async fun
         return;
     }
 
+    // Critical safety check before wiping the DB
     if (!confirm("Esto BORRARÁ tu biblioteca actual y la reemplazará por el contenido del CSV. ¿Continuar?")) {
-        event.target.value = "";
+        event.target.value = ""; // Reset input so user can select the same file again if they change their mind later
         return;
     }
 
@@ -623,7 +653,7 @@ document.getElementById("import-csv-input").addEventListener("change", async fun
     try {
         response = await fetch("/import/csv", {
             method: "POST",
-            body: formData
+            body: formData // Content-Type is automatically set for multipart/form-data
         });
 
         if (!response.ok) {
@@ -637,10 +667,12 @@ document.getElementById("import-csv-input").addEventListener("change", async fun
         console.error(err);
         alert("No se pudo importar el CSV.");
     } finally {
+        // Always reset the file input so the 'change' event works for subsequent uploads
         event.target.value = "";
     }
 });
 
+// Import logic for wishlist CSV (Functions identically to main library import).
 document.getElementById("import-wishlist-csv-input").addEventListener("change", async function (event) {
     var file;
     var formData;
@@ -681,6 +713,8 @@ document.getElementById("import-wishlist-csv-input").addEventListener("change", 
     }
 });
 
+// Initialization: Call rendering functions when the script first loads
+// to populate all forms and tables on the page.
 loadHeader();
 renderAddGameForm();
 renderAddPlatformForm();

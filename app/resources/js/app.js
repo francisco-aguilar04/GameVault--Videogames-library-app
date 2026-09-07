@@ -1,26 +1,28 @@
-var MAX_VISIBLE_GENRES = 2;
-var platformMap = {};
-var genreMap = {};
-var mapsLoaded = false;
-var platformColorMap = {};
+// Global state shared by the whole page.
+var MAX_VISIBLE_GENRES = 2; // Max number of genres shown before collapsing into "+N"
+var platformMap = {};       // platform id -> platform name
+var genreMap = {};          // genre id -> genre name
+var platformColorMap = {};  // platform id -> hex color for its badge
+var mapsLoaded = false;     // avoids re-fetching platforms/genres more than once
 
-//For pagination
+// Pagination state
 var PAGE_SIZE = 30;
 var currentPage = 1;
-var fullGamesList = [];
+var fullGamesList = []; // all games currently loaded (before slicing into pages)
 
-var currentGames = [];
-var sortAscending = true;
+var currentGames = [];      // last game list fetched (used as the base for sorting)
+var sortAscending = true;   // title sort direction
+var ratingSortAscending = true; // rating sort direction
 
-var ratingSortAscending = true;
-
+// Fetches platforms and genres once, and stores them in the maps above
+// so we don't hit the API again every time we need a name or color.
 async function loadMaps() {
 	var platformsResponse;
 	var platformsList;
 	var genresResponse;
 	var genresList;
 
-	if (mapsLoaded) return;
+	if (mapsLoaded) return; // already loaded, nothing to do
 
 	platformsResponse = await fetch("/platforms");
 	platformsList = await platformsResponse.json();
@@ -44,6 +46,8 @@ async function loadMaps() {
 	mapsLoaded = true;
 }
 
+// Loads the full game list and renders it. This is the entry point
+// called when the library page first loads.
 async function loadGames() {
 	var gamesResponse;
 	var games;
@@ -59,6 +63,7 @@ async function loadGames() {
 
 // Filters
 
+// Re-fetches games filtered by status ("todos" or empty means "no filter").
 async function filterGamesByStatus(status) {
 	var endpoint;
 	var response;
@@ -90,6 +95,7 @@ async function filterGamesByStatus(status) {
 	}
 }
 
+// Same idea as above, but searching by (partial) title.
 async function filterGamesByTitle(title) {
 	var endpoint;
 	var response;
@@ -121,6 +127,7 @@ async function filterGamesByTitle(title) {
 	}
 }
 
+// Reads the search box and triggers the title filter.
 function handleTitleSearch() {
 
 	var inputEl = document.getElementById("title-search");
@@ -129,12 +136,14 @@ function handleTitleSearch() {
 	filterGamesByTitle(title);
 }
 
+// Lets the user press Enter instead of clicking the search button.
 document.getElementById("title-search").addEventListener("keydown", function (e) {
 	if (e.key === "Enter") {
 		handleTitleSearch();
 	}
 });
 
+// Same filtering pattern as status/title, but by platform id.
 async function filterGamesByPlatform(platformId) {
 	var endpoint;
 	var response;
@@ -166,6 +175,7 @@ async function filterGamesByPlatform(platformId) {
 	}
 }
 
+// Fills the platform <select> with one <option> per known platform.
 function populatePlatformFilter() {
 
 	var selectEl = document.getElementById("platform-filter");
@@ -181,6 +191,7 @@ function populatePlatformFilter() {
 	}
 }
 
+// Same as above, but for genres, sorted alphabetically first.
 function populateGenreFilter() {
 	var selectEl = document.getElementById("genre-filter");
 	var genreEntries = Object.entries(genreMap).sort(function (a, b) {
@@ -195,6 +206,7 @@ function populateGenreFilter() {
 	});
 }
 
+// Same filtering pattern as status/title/platform, but by genre id.
 async function filterGamesByGenre(genreId) {
 	var endpoint;
 	var response;
@@ -226,6 +238,7 @@ async function filterGamesByGenre(genreId) {
 	}
 }
 
+// Flips the A-Z / Z-A sort direction and re-renders with the same data.
 function toggleSort() {
 	sortAscending = !sortAscending;
 
@@ -235,6 +248,7 @@ function toggleSort() {
 	renderGames(sortGames(currentGames), platformMap, genreMap);
 }
 
+// Returns a new sorted copy of the games array (never mutates the original).
 function sortGames(games) {
 	var sorted = games.slice();
 
@@ -246,6 +260,7 @@ function sortGames(games) {
 	return sorted;
 }
 
+// Flips the rating sort direction and re-renders.
 function toggleRatingSort() {
 	ratingSortAscending = !ratingSortAscending;
 
@@ -256,6 +271,9 @@ function toggleRatingSort() {
 	renderGames(sortGamesByRating(currentGames), platformMap, genreMap);
 }
 
+// Same as sortGames, but by rating instead of title.
+// Games without a rating (null) are treated as -1 so they always
+// end up at one end of the list, never mixed randomly with rated ones.
 function sortGamesByRating(games) {
 	var sorted = games.slice();
 
@@ -269,8 +287,10 @@ function sortGamesByRating(games) {
 	return sorted;
 }
 
-//Header
+// Header
 
+// Loads the shared header/nav bar from its own HTML file and injects it,
+// so every page shows the same header without copy-pasting the markup.
 async function loadHeader() {
 	var response;
 	var html;
@@ -285,6 +305,7 @@ async function loadHeader() {
 	markActiveLink();
 }
 
+// Highlights the nav link matching the current page URL.
 function markActiveLink() {
 	var links = document.querySelectorAll("nav .nav-link");
 	var currentPath = window.location.pathname;
@@ -297,8 +318,10 @@ function markActiveLink() {
 	}
 }
 
-// Gamecards building
+// Game cards building
 
+// Entry point called every time we get a new list of games to show
+// (initial load, filter, search...). Stores the list and resets to page 1.
 function renderGames(games, pMap, gMap) {
 	fullGamesList = games || [];
 	platformMap = pMap;
@@ -307,6 +330,7 @@ function renderGames(games, pMap, gMap) {
 	renderGamesPage();
 }
 
+// Renders only the current page's slice of fullGamesList as cards.
 function renderGamesPage() {
 	var gridEl = document.getElementById("games-grid");
 	var start;
@@ -329,6 +353,7 @@ function renderGamesPage() {
 	renderPaginationControls();
 }
 
+// Builds the "Previous / 1 2 3 / Next" pagination buttons.
 function renderPaginationControls() {
 	var paginationEl = document.getElementById("pagination");
 	var totalPages = Math.ceil(fullGamesList.length / PAGE_SIZE);
@@ -336,7 +361,7 @@ function renderPaginationControls() {
 	var html = "";
 
 	if (totalPages <= 1) {
-		paginationEl.innerHTML = "";
+		paginationEl.innerHTML = ""; // no pagination needed for a single page
 		return;
 	}
 
@@ -354,11 +379,12 @@ function renderPaginationControls() {
 	paginationEl.innerHTML = html;
 }
 
+// Switches to a given page number, if it's valid, and scrolls back to top.
 function goToPage(page) {
 	var totalPages = Math.ceil(fullGamesList.length / PAGE_SIZE);
 
 	if (page < 1 || page > totalPages) {
-		return;
+		return; // ignore invalid page numbers
 	}
 
 	currentPage = page;
@@ -366,6 +392,7 @@ function goToPage(page) {
 	window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// Builds one game card from the <template>, filling in all its fields.
 function buildGameCard(game, platformMap, genreMap) {
 	var template;
 	var clone;
@@ -379,8 +406,9 @@ function buildGameCard(game, platformMap, genreMap) {
 	var pillsEl;
 
 	template = document.getElementById("game-card-template");
-	clone = template.content.cloneNode(true);
+	clone = template.content.cloneNode(true); // fresh copy of the template markup
 
+	// Clicking anywhere on the card opens the edit modal for this game.
 	var cardEl = clone.querySelector(".card");
 	cardEl.setAttribute("data-id", game.id);
 	cardEl.style.cursor = "pointer";
@@ -398,6 +426,8 @@ function buildGameCard(game, platformMap, genreMap) {
 
 	clone.querySelector(".game-title").textContent = truncateTitle(game.title, 41);
 
+	// Year is hidden completely (not just emptied) when the game has none,
+	// so it doesn't leave a visual gap next to the genres.
 	yearEl = clone.querySelector(".game-year");
 	hasYear = !!game.release_year;
 	yearEl.textContent = game.release_year || "";
@@ -408,11 +438,13 @@ function buildGameCard(game, platformMap, genreMap) {
 
 	hasGenres = appendGenreBadges(genresEl, game.genre_ids, genreMap);
 
+	// The "•" separator between year and genres only shows when both exist.
 	separatorEl = clone.querySelector(".game-separator");
 	separatorEl.style.display = (hasYear && hasGenres) ? "inline" : "none";
 
 	clone.querySelector(".game-stars").innerHTML = buildStars(game.rating);
 
+	// One colored badge per platform the game is available on.
 	pillsEl = clone.querySelector(".game-pills");
 	pillsEl.innerHTML = "";
 
@@ -425,7 +457,7 @@ function buildGameCard(game, platformMap, genreMap) {
 		if (name) {
 			pill = document.createElement("span");
 			pill.className = "badge me-1";
-			pill.style.backgroundColor = platformColorMap[id] || "#6c757d";
+			pill.style.backgroundColor = platformColorMap[id] || "#6c757d"; // fallback gray
 			pill.textContent = name;
 			pillsEl.appendChild(pill);
 		}
@@ -434,6 +466,9 @@ function buildGameCard(game, platformMap, genreMap) {
 	return clone;
 }
 
+// Adds genre labels to a container, showing at most MAX_VISIBLE_GENRES
+// and collapsing the rest into a "+N" badge. Returns true if it added
+// at least one genre (used to decide whether to show the "•" separator).
 function appendGenreBadges(container, genreIds, genreMap) {
 	var ids;
 	var names;
@@ -475,6 +510,7 @@ function appendGenreBadges(container, genreIds, genreMap) {
 	return names.length > 0;
 }
 
+// Builds the star rating icons: full, half or empty, depending on the value.
 function buildStars(rating) {
 	var value;
 	var html;
@@ -497,6 +533,7 @@ function buildStars(rating) {
 	return html;
 }
 
+// Maps a game status to its Bootstrap badge color class.
 function statusBadgeClass(status) {
 	var classes;
 
@@ -509,6 +546,7 @@ function statusBadgeClass(status) {
 	return classes[status] || "bg-secondary";
 }
 
+// Maps a game status to the label shown to the user.
 function statusLabel(status) {
 	var labels;
 
@@ -521,6 +559,7 @@ function statusLabel(status) {
 	return labels[status] || status;
 }
 
+// Cuts a title down to maxLength characters, adding "…" if it was cut.
 function truncateTitle(title, maxLength) {
 
 	if (title.length <= maxLength) {
@@ -530,6 +569,9 @@ function truncateTitle(title, maxLength) {
 	return title.slice(0, maxLength - 1) + "…";
 }
 
+// Old way of picking a platform badge color by matching keywords in its name.
+// No longer used now that platforms have a real color field (see platformColorMap),
+// kept here in case it's useful again later.
 function platformBadgeClass(name) {
 	var lower;
 
@@ -554,6 +596,9 @@ function platformBadgeClass(name) {
 	return "bg-dark";
 }
 
+// Builds a list of checkboxes (one per item), pre-checking the ones
+// whose id is in selectedIds. Used for the platform/genre pickers
+// in the add/edit game forms.
 function buildCheckboxListHTML(namePrefix, items, selectedIds) {
 	var html = '<div class="checklist-box">';
 	var selected = selectedIds || [];
@@ -573,6 +618,8 @@ function buildCheckboxListHTML(namePrefix, items, selectedIds) {
 	return html;
 }
 
+// Reads all checked checkboxes with the given name and returns their
+// values as an array of numbers. Used to collect selected platform/genre ids.
 function getCheckedIds(namePrefix) {
 	var ids = [];
 	document.querySelectorAll('input[name="' + namePrefix + '"]:checked').forEach(function (cb) {
@@ -581,6 +628,8 @@ function getCheckedIds(namePrefix) {
 	return ids;
 }
 
+// Runs once the page's HTML is ready: loads platforms/genres and
+// fills the two filter dropdowns with them.
 document.addEventListener("DOMContentLoaded", async function () {
 	try {
 
@@ -595,5 +644,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 	}
 });
 
+// Kicks off the page: load the shared header, then load and render the games.
 loadHeader();
 loadGames();
