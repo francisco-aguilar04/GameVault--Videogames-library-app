@@ -1,43 +1,34 @@
-# === PYTHON ===
-# Ignorar entornos virtuales (tanto venv como .venv si volviera a aparecer)
-**/venv/
-**/.venv/
-ENV/
-env/
-
-# Archivos temporales de Python y caché
-**/__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-htmlcov/
-.tox/
-.coverage
-.cache
-.pytest_cache/
-
 # === GO (GOLANG) ===
-# Binarios compilados y ejecutables
-**/backend-go/backend-go
+# Compiled binaries and executables
+/app/app
+/app/gamevault-backend
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
 
-# Carpetas de testing y temporales de Go
+# Test and coverage files
 *.test
 *.out
+coverage.txt
 
-# === VARIABLES DE ENTORNO (Seguridad) ===
-# Archivos donde guardaremos contraseñas y llaves de la IA más adelante
+# Dependency download cache (safe to omit, go.sum already pins versions)
+/vendor/
+
+# === DATABASE ===
+# Local SQLite files, in case that path is revisited
+*.db
+*.db-journal
+
+# === ENVIRONMENT VARIABLES (Security) ===
+# Real credentials must never be committed
 .env
 .env.local
 .env.*
 postgres.env
 
-# === EDITORES DE CÓDIGO Y SISTEMA ===
+# === EDITORS AND SYSTEM ===
 .vscode/
 .idea/
 *.suo
