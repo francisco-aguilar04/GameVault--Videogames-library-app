@@ -1,0 +1,54 @@
+CREATE TABLE platforms (
+    id     SERIAL PRIMARY KEY,
+    name   VARCHAR(100) NOT NULL UNIQUE,
+    color  VARCHAR(7) NOT NULL DEFAULT '#6c757d'
+);
+
+CREATE TABLE games (
+    id            SERIAL PRIMARY KEY,
+    title         VARCHAR(255) NOT NULL,
+    rating        NUMERIC(2,1) CHECK (rating >= 0 AND rating <= 5 AND (rating * 2) = FLOOR(rating * 2)),
+    review        TEXT,
+    status        VARCHAR(20) NOT NULL DEFAULT 'pendiente' CHECK (status IN ('pendiente', 'jugando', 'completado')),
+    release_year  SMALLINT CHECK (release_year > 1950),
+    photo_url     VARCHAR(500),
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE game_platforms (
+    game_id      INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+    platform_id  INTEGER NOT NULL REFERENCES platforms(id) ON DELETE RESTRICT,
+    PRIMARY KEY (game_id, platform_id)
+);
+
+CREATE TABLE genres (
+    id   SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE game_genres (
+    game_id  INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+    genre_id INTEGER NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+    PRIMARY KEY (game_id, genre_id)
+);
+
+CREATE TABLE wishlist (
+    id            SERIAL PRIMARY KEY,
+    title         VARCHAR(255) NOT NULL,
+    photo_url     VARCHAR(500),
+    release_year SMALLINT CHECK (release_year > 1950),
+    notes         TEXT,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE wishlist_platforms (
+    wishlist_id  INTEGER NOT NULL REFERENCES wishlist(id) ON DELETE CASCADE,
+    platform_id  INTEGER NOT NULL REFERENCES platforms(id) ON DELETE CASCADE,
+    PRIMARY KEY (wishlist_id, platform_id)
+);
+
+CREATE TABLE wishlist_genres (
+    wishlist_id  INTEGER NOT NULL REFERENCES wishlist(id) ON DELETE CASCADE,
+    genre_id     INTEGER NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+    PRIMARY KEY (wishlist_id, genre_id)
+);
