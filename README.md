@@ -2,6 +2,16 @@
 
 GameVault is a web application designed to catalog and manage a personal video game library. Unlike a price comparator, it focuses on organizing the games you own: tracking their status, rating them, associating them with multiple platforms and genres, and keeping a separate wishlist for the games you don't own yet. It also includes visual statistics, CSV import/export, and a management panel to keep the catalog data (platforms and genres) under control.
 
+## Screenshots
+
+| Library | Edit modal |
+| --- | --- |
+| ![Library view](./screenshots/GV-Library.png) | ![Edit game modal](./screenshots/GV-Edit.png) |
+
+| Statistics | Management |
+| --- | --- |
+| ![Statistics page](./screenshots/GV-Stats.png) | ![Management panel](./screenshots/GV-Management.png) |
+
 ## Index
 
 - [Features](#features)
